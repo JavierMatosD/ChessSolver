@@ -15,7 +15,7 @@ public class Solver
      * @param  string with the filename
      * @return 2D array representing the chess board
      */
-    public static Enum[][] ReadAndConvert(String FILENAME)
+    public static ChessPiece[][] ReadAndConvert(String FILENAME)
     {
         ChessPiece[][] board = new ChessPiece[8][8];
 
@@ -55,6 +55,18 @@ public class Solver
     public static Move[] SolvePuzzle(ChessPiece[][] board, int numMoves)
     {
         Move[] winningMoves = new Move[2];
+
+        //Brute force implementation
+        Move[] legalMoves = GetLegalMoves(board, true);
+        int counter = 0;
+        for (Move move : legalMoves) 
+        {
+            if (move.checkMate(board))
+            {
+                winningMoves[counter] = move;
+                counter++;
+            }
+        }
 
         return winningMoves;
     }

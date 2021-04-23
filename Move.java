@@ -5,14 +5,23 @@ import java.security.PublicKey;
  */
 public class Move 
 {
-    Enum chessPiece;
+    ChessPiece chessPiece;
     int x;
     int y;
 
-    Move(Enum piece, int x, int y)
+    Move(ChessPiece piece, int x, int y)
     {
         this.chessPiece = piece;
         this.x = x;
         this.y = y;
+    }
+
+    public boolean checkMate(ChessPiece[][] board)
+    {
+        if(board[this.x][this.y] == ChessPiece.B_KING || board[this.x][this.y] == ChessPiece.W_KING)
+        {
+            return true;
+        }
+        return false;
     }
 }
