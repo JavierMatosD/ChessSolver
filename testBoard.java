@@ -25,7 +25,7 @@ public class testBoard {
         ChessBoard gui = new ChessBoard(chessPieces);
 
         try {
-            Thread.sleep(3000);
+            Thread.sleep(1000);
         } catch (InterruptedException e1) {
             e1.printStackTrace();
         }
@@ -37,14 +37,38 @@ public class testBoard {
         gui.move(from, to);
 
         try {
-            Thread.sleep(3000);
+            Thread.sleep(1000);
         } catch (InterruptedException e1) {
             e1.printStackTrace();
         }
 
         // move again
         from = new int[] { 6, 4 };
-        to = new int[] { 4, 4 };
+        to = new int[] { 5, 4 };
+
+        gui.move(from, to);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+        }
+
+        // move again
+        from = new int[] { 1, 0 };
+        to = new int[] { 2, 0 };
+
+        gui.move(from, to);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+        }
+
+        // move again
+        from = new int[] { 7, 5 };
+        to = new int[] { 2, 0 };
 
         gui.move(from, to);
     }
