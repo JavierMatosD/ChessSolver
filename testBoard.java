@@ -1,25 +1,51 @@
 import java.awt.*;
 import javax.swing.*;
 
-//testing chessboard graphics
-public class testBoard {
-    static final int WHITE = 0, BLACK = 1;
-    static final int KING = 0, QUEEN = 1, CASTLE = 2, BISHOP = 3, KNIGHT = 4, PAWN = 5;
+// testing chessboard graphics
 
-    // will take in enum of chess pieces at some point
-    public static final int[] order = new int[] { CASTLE, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, CASTLE };
+public class testBoard {
 
     public static void main(String[] args) {
-        JPanel gui = new JPanel(new GridLayout(0, 8, 0, 0));
-        ChessBoard chess = new ChessBoard(gui);
+        // initialize chessboard
+        ChessPiece[][] chessPieces = new ChessPiece[8][8];
+        chessPieces[0] = new ChessPiece[] { ChessPiece.W_CASTLE, ChessPiece.W_KNIGHT, ChessPiece.W_BISHOP,
+                ChessPiece.W_QUEEN, ChessPiece.W_KING, ChessPiece.W_BISHOP, ChessPiece.W_KNIGHT, ChessPiece.W_CASTLE };
+        chessPieces[1] = new ChessPiece[] { ChessPiece.W_PAWN, ChessPiece.W_PAWN, ChessPiece.W_PAWN, ChessPiece.W_PAWN,
+                ChessPiece.W_PAWN, ChessPiece.W_PAWN, ChessPiece.W_PAWN, ChessPiece.W_PAWN };
+
+        for (int i = 2; i < 6; i++) {
+            chessPieces[i] = new ChessPiece[] { ChessPiece.EMPTY, ChessPiece.EMPTY, ChessPiece.EMPTY, ChessPiece.EMPTY,
+                    ChessPiece.EMPTY, ChessPiece.EMPTY, ChessPiece.EMPTY, ChessPiece.EMPTY };
+        }
+        chessPieces[6] = new ChessPiece[] { ChessPiece.B_PAWN, ChessPiece.B_PAWN, ChessPiece.B_PAWN, ChessPiece.B_PAWN,
+                ChessPiece.B_PAWN, ChessPiece.B_PAWN, ChessPiece.B_PAWN, ChessPiece.B_PAWN };
+        chessPieces[7] = new ChessPiece[] { ChessPiece.B_CASTLE, ChessPiece.B_KNIGHT, ChessPiece.B_BISHOP,
+                ChessPiece.B_QUEEN, ChessPiece.B_KING, ChessPiece.B_BISHOP, ChessPiece.B_KNIGHT, ChessPiece.B_CASTLE };
+
+        ChessBoard gui = new ChessBoard(chessPieces);
 
         try {
-            Thread.sleep(5000);
+            Thread.sleep(3000);
         } catch (InterruptedException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
 
-        chess.swap(gui);
+        // move piece
+        int[] from = new int[] { 0, 1 };
+        int[] to = new int[] { 2, 2 };
+
+        gui.move(from, to);
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+        }
+
+        // move again
+        from = new int[] { 6, 4 };
+        to = new int[] { 4, 4 };
+
+        gui.move(from, to);
     }
 }

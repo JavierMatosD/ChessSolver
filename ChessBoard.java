@@ -8,29 +8,26 @@ import java.util.*;
 
 // https://stackoverflow.com/questions/18686199/fill-unicode-characters-in-labels/18686753#18686753
 class ChessBoard {
-
-    /**
-     * Unicodes for chess pieces.
-     */
+    // unicodes for chess pieces
     static final String[] pieces = { "\u2654", "\u2655", "\u2656", "\u2657", "\u2658", "\u2659", "\u0000" };
+    // mapping from piece to unicode
     static final int KING = 0, QUEEN = 1, CASTLE = 2, BISHOP = 3, KNIGHT = 4, PAWN = 5, EMPTY = 6;
 
-    // will take in enum of chess pieces at some point
-    public static final int[] order = new int[] { CASTLE, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, CASTLE };
-
-    /*
-     * Colors..
-     */
-    public static final Color outlineColor = Color.DARK_GRAY;
-    public static final Color[] pieceColors = { new Color(203, 203, 197), new Color(192, 142, 60) };
+    // colors
+    public final Color outlineColor = Color.DARK_GRAY;
+    public final Color[] pieceColors = { new Color(203, 203, 197), new Color(192, 142, 60) };
     static final int WHITE = 0, BLACK = 1;
 
-    /*
-     * Font. The images use the font sizeXsize.
-     */
+    // font
     static Font font = new Font("Sans-Serif", Font.PLAIN, 64);
 
-    public static ArrayList<Shape> separateShapeIntoRegions(Shape shape) {
+    // gui
+    JPanel gui;
+
+    // state of the board - to enable fast movement instead of repainting gui
+    ChessPiece[] state = new ChessPiece[64];
+
+    private ArrayList<Shape> separateShapeIntoRegions(Shape shape) {
         ArrayList<Shape> regions = new ArrayList<Shape>();
 
         PathIterator pi = shape.getPathIterator(null);
@@ -64,7 +61,7 @@ class ChessBoard {
         return regions;
     }
 
-    public static BufferedImage getImageForChessPiece(int piece, int side, boolean gradient) {
+    private BufferedImage getImageForChessPiece(int piece, int side, boolean gradient) {
         int sz = font.getSize();
         BufferedImage bi = new BufferedImage(sz, sz, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = bi.createGraphics();
@@ -116,55 +113,55 @@ class ChessBoard {
         return bi;
     }
 
-    public static void addColoredUnicodeCharToContainer(Container c, int piece, int side, Color bg, boolean gradient) {
+    // add item to JPanel "Array"
+    private void addColoredUnicodeCharToContainer(int piece, int index, int side, Color bg, boolean gradient) {
         JLabel l = new JLabel(new ImageIcon(getImageForChessPiece(piece, side, gradient)), JLabel.CENTER);
         l.setBackground(bg);
         l.setOpaque(true);
-        c.add(l);
+        this.gui.add(l, index);
     }
 
-    public static void addPiecesToContainer(Container c, int intialSquareColor, int side, int[] pieces,
-            boolean gradient) {
+    // mapping from piece to unicode
+    private int determineNumber(String pieceName) {
+        switch (pieceName) {
+        case "KING":
+            return 0;
+        case "QUEEN":
+            return 1;
+        case "CASTLE":
+            return 2;
+        case "BISHOP":
+            return 3;
+        case "KNIGHT":
+            return 4;
+        case "PAWN":
+            return 5;
+        case "PTY": // empty
+            return 6;
+        }
+        return -1;
+    }
 
-        for (int piece : pieces) {
-            addColoredUnicodeCharToContainer(c, piece, side,
-                    intialSquareColor++ % 2 == BLACK ? Color.BLACK : Color.WHITE, gradient);
+    // determine the background on the board
+    private Color determineBackground(int i, int j) {
+        if (i % 2 != 0) {
+            if (j % 2 == 0) {
+                return Color.WHITE;
+            } else {
+                return Color.BLACK;
+            }
+        } else {
+            if (j % 2 == 0) {
+                return Color.BLACK;
+            } else {
+                return Color.WHITE;
+            }
         }
     }
 
-    public static void addPiecesToContainer(Container c, Color bg, int side, int[] pieces, boolean gradient) {
-        for (int piece : pieces) {
-            addColoredUnicodeCharToContainer(c, piece, side, bg, gradient);
-        }
-    }
-
-    // testing this class
-    public void swap(JPanel gui) {
-        final int[] pawnRow = new int[] { PAWN, PAWN, PAWN, PAWN, EMPTY, PAWN, PAWN, PAWN };
-        final int[] pawnRow2 = new int[] { EMPTY, EMPTY, EMPTY, EMPTY, PAWN, EMPTY, EMPTY, EMPTY };
-        final int[] emptyRow = new int[] { EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY };
-        boolean gradientFill = true;
-
-        gui.removeAll();
-        addPiecesToContainer(gui, BLACK, WHITE, order, gradientFill);
-        addPiecesToContainer(gui, WHITE, WHITE, pawnRow, gradientFill);
-        addPiecesToContainer(gui, BLACK, WHITE, pawnRow2, gradientFill);
-        addPiecesToContainer(gui, WHITE, BLACK, emptyRow, gradientFill);
-        addPiecesToContainer(gui, BLACK, BLACK, emptyRow, gradientFill);
-        addPiecesToContainer(gui, WHITE, BLACK, pawnRow2, gradientFill);
-        addPiecesToContainer(gui, BLACK, BLACK, pawnRow, gradientFill);
-        addPiecesToContainer(gui, WHITE, BLACK, order, gradientFill);
-        gui.revalidate();
-        gui.repaint();
-
-    }
-
-    public ChessBoard(JPanel gui) {
-        final int[] pawnRow = new int[] { PAWN, PAWN, PAWN, PAWN, EMPTY, PAWN, PAWN, PAWN };
-        final int[] pawnRow2 = new int[] { EMPTY, EMPTY, EMPTY, EMPTY, PAWN, EMPTY, EMPTY, EMPTY };
-        final int[] emptyRow = new int[] { EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY };
-
-        boolean gradientFill = true;
+    public ChessBoard(ChessPiece[][] chessPieces) {
+        JPanel gui = new JPanel(new GridLayout(0, 8, 0, 0));
+        this.gui = gui;
 
         // enables program to run later - enables us to change gui dynamically at a
         // later point after initialization
@@ -173,19 +170,90 @@ class ChessBoard {
             public void run() {
                 gui.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.GRAY.brighter(), Color.GRAY,
                         Color.GRAY.darker(), Color.GRAY));
-                addPiecesToContainer(gui, WHITE, BLACK, order, gradientFill);
-                addPiecesToContainer(gui, BLACK, BLACK, pawnRow, gradientFill);
-                addPiecesToContainer(gui, WHITE, BLACK, pawnRow2, gradientFill);
-                addPiecesToContainer(gui, BLACK, BLACK, emptyRow, gradientFill);
-                addPiecesToContainer(gui, WHITE, BLACK, emptyRow, gradientFill);
-                addPiecesToContainer(gui, BLACK, WHITE, pawnRow2, gradientFill);
-                addPiecesToContainer(gui, WHITE, WHITE, pawnRow, gradientFill);
-                addPiecesToContainer(gui, BLACK, WHITE, order, gradientFill);
+                // map to the static indices defined in the class
+                boolean gradientFill = true;
+
+                for (int i = 0; i < chessPieces.length; i++) {
+                    for (int j = 0; j < chessPieces[0].length; j++) {
+                        ChessPiece piece = chessPieces[i][j];
+
+                        // store it in the state variable for future tracking
+                        int index = 8 * i + j;
+                        state[index] = piece;
+
+                        // determine name
+                        String pieceName = piece.name().substring(2);
+                        int pieceNumber = determineNumber(pieceName);
+
+                        // determine background color of board
+                        Color bg = determineBackground(i, j);
+
+                        // determine side of piece
+                        char side = piece.name().charAt(0);
+                        int sideNumber = 0;
+
+                        if (side == 'B') {
+                            sideNumber = 1;
+                        }
+
+                        // draw
+                        addColoredUnicodeCharToContainer(pieceNumber, index, sideNumber, bg, gradientFill);
+                    }
+                }
+
                 JOptionPane.showOptionDialog(null, gui, "ChessBoard", JOptionPane.NO_OPTION, JOptionPane.NO_OPTION,
                         null, new Object[] {}, null);
             }
         };
 
         SwingUtilities.invokeLater(r);
+    }
+
+    // move a piece
+    public void move(int[] from, int[] to) {
+        // converting them to jpanel coordinates
+        // to find its position in the JPanel "Array"
+        int f = 8 * from[0] + from[1];
+        int t = 8 * to[0] + to[1];
+
+        // get the pieces from state
+        ChessPiece fromPiece = state[f];
+        ChessPiece toPiece = state[t];
+
+        // determine name of piece we are moving
+        // if there is a piece where we are moving
+        // it wouldn't matter - we are going to capture it
+        String pieceName = fromPiece.name().substring(2);
+        int pieceNumber = determineNumber(pieceName);
+
+        // determine background color of board on both pieces
+        Color from_bg = determineBackground(from[0], from[1]);
+        Color to_bg = determineBackground(to[0], to[1]);
+
+        // determine side of piece we are moving
+        // if there is a piece where we are moving
+        // it wouldn't matter - we are going to capture it
+        char side = fromPiece.name().charAt(0);
+        int sideNumber = 0;
+
+        if (side == 'B') {
+            sideNumber = 1;
+        }
+
+        // replace from with empty box
+        gui.remove(f);
+        addColoredUnicodeCharToContainer(6, f, 0, from_bg, true);
+
+        // replace to with from piece
+        gui.remove(t);
+        addColoredUnicodeCharToContainer(pieceNumber, t, sideNumber, to_bg, true);
+
+        // change state to reflect these changes
+        state[f] = ChessPiece.EMPTY;
+        state[t] = fromPiece;
+
+        // repaint gui
+        gui.revalidate();
+        gui.repaint();
     }
 }
