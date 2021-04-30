@@ -6,19 +6,23 @@ import java.security.PublicKey;
 public class Move 
 {
     ChessPiece chessPiece;
-    int x;
-    int y;
+    int x_start;
+    int y_start;
+    int x_end;
+    int y_end;
 
-    Move(ChessPiece piece, int x, int y)
+    Move(ChessPiece piece, int x_start, int y_start, int x_end, int y_end)
     {
         this.chessPiece = piece;
-        this.x = x;
-        this.y = y;
+        this.x_start = x_start;
+        this.y_start = y_start;
+        this.y_end = y_end;
+        this.x_end = x_end;
     }
 
     public boolean checkMate(ChessPiece[][] board)
     {
-        if(board[this.x][this.y] == ChessPiece.B_KING || board[this.x][this.y] == ChessPiece.W_KING)
+        if(board[this.x_end][this.y_end].getMyType() == type.KING)
         {
             return true;
         }
