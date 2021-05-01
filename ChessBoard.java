@@ -11,7 +11,7 @@ class ChessBoard {
     // unicodes for chess pieces
     static final String[] pieces = { "\u2654", "\u2655", "\u2656", "\u2657", "\u2658", "\u2659", "\u0000" };
     // mapping from piece to unicode
-    static final int KING = 0, QUEEN = 1, CASTLE = 2, BISHOP = 3, KNIGHT = 4, PAWN = 5, EMPTY = 6;
+    static final int KING = 0, QUEEN = 1, ROOK = 2, BISHOP = 3, KNIGHT = 4, PAWN = 5, EMPTY = 6;
 
     // colors
     public final Color outlineColor = Color.DARK_GRAY;
@@ -128,7 +128,7 @@ class ChessBoard {
             return 0;
         case "QUEEN":
             return 1;
-        case "CASTLE":
+        case "ROOK":
             return 2;
         case "BISHOP":
             return 3;
