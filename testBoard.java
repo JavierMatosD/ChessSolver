@@ -8,19 +8,24 @@ public class testBoard {
     public static void main(String[] args) {
         // initialize chessboard
         ChessPiece[][] chessPieces = new ChessPiece[8][8];
-        chessPieces[0] = new ChessPiece[] { ChessPiece.W_CASTLE, ChessPiece.W_KNIGHT, ChessPiece.W_BISHOP,
-                ChessPiece.W_QUEEN, ChessPiece.W_KING, ChessPiece.W_BISHOP, ChessPiece.W_KNIGHT, ChessPiece.W_CASTLE };
-        chessPieces[1] = new ChessPiece[] { ChessPiece.W_PAWN, ChessPiece.W_PAWN, ChessPiece.W_PAWN, ChessPiece.W_PAWN,
-                ChessPiece.W_PAWN, ChessPiece.W_PAWN, ChessPiece.W_PAWN, ChessPiece.W_PAWN };
+        chessPieces[0] = new ChessPiece[] { new ChessPiece(type.ROOK, true), new ChessPiece(type.KNIGHT, true), new ChessPiece(type.BISHOP, true),
+                new ChessPiece(type.QUEEN, true),new ChessPiece(type.KING, true),new ChessPiece(type.BISHOP, true),
+                new ChessPiece(type.KNIGHT, true),new ChessPiece(type.ROOK, true) };
+        chessPieces[1] = new ChessPiece[] { new ChessPiece(type.PAWN, true), new ChessPiece(type.PAWN, true), new ChessPiece(type.PAWN, true),
+                new ChessPiece(type.PAWN, true),new ChessPiece(type.PAWN, true),new ChessPiece(type.PAWN, true),
+                new ChessPiece(type.PAWN, true),new ChessPiece(type.PAWN, true) };
 
         for (int i = 2; i < 6; i++) {
-            chessPieces[i] = new ChessPiece[] { ChessPiece.EMPTY, ChessPiece.EMPTY, ChessPiece.EMPTY, ChessPiece.EMPTY,
-                    ChessPiece.EMPTY, ChessPiece.EMPTY, ChessPiece.EMPTY, ChessPiece.EMPTY };
+            chessPieces[i] = new ChessPiece[] { new ChessPiece(), new ChessPiece(), new ChessPiece(),
+                    new ChessPiece(), new ChessPiece(), new ChessPiece(),
+                    new ChessPiece(), new ChessPiece()};
         }
-        chessPieces[6] = new ChessPiece[] { ChessPiece.B_PAWN, ChessPiece.B_PAWN, ChessPiece.B_PAWN, ChessPiece.B_PAWN,
-                ChessPiece.B_PAWN, ChessPiece.B_PAWN, ChessPiece.B_PAWN, ChessPiece.B_PAWN };
-        chessPieces[7] = new ChessPiece[] { ChessPiece.B_CASTLE, ChessPiece.B_KNIGHT, ChessPiece.B_BISHOP,
-                ChessPiece.B_QUEEN, ChessPiece.B_KING, ChessPiece.B_BISHOP, ChessPiece.B_KNIGHT, ChessPiece.B_CASTLE };
+        chessPieces[6] = new ChessPiece[] { new ChessPiece(type.PAWN, false), new ChessPiece(type.PAWN, false), new ChessPiece(type.PAWN, false),
+                new ChessPiece(type.PAWN, false),new ChessPiece(type.PAWN, false),new ChessPiece(type.PAWN, false),
+                new ChessPiece(type.PAWN, false),new ChessPiece(type.PAWN, false) };
+        chessPieces[7] = new ChessPiece[] { new ChessPiece(type.ROOK, false), new ChessPiece(type.KNIGHT, false), new ChessPiece(type.BISHOP, false),
+                new ChessPiece(type.QUEEN, false),new ChessPiece(type.KING, false),new ChessPiece(type.BISHOP, false),
+                new ChessPiece(type.KNIGHT, false),new ChessPiece(type.ROOK, false) };
 
         ChessBoard gui = new ChessBoard(chessPieces);
 

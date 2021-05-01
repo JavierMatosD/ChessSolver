@@ -136,7 +136,7 @@ class ChessBoard {
             return 4;
         case "PAWN":
             return 5;
-        case "PTY": // empty
+        case "EMPTY": // empty
             return 6;
         }
         return -1;
@@ -180,16 +180,18 @@ class ChessBoard {
                         // store it in the state variable for future tracking
                         int index = 8 * i + j;
                         state[index] = piece;
-
+                        System.out.println(state[index]);
                         // determine name
-                        String pieceName = piece.name().substring(2);
+                        String pieceName = piece.getMyType().toString();
                         int pieceNumber = determineNumber(pieceName);
 
                         // determine background color of board
                         Color bg = determineBackground(i, j);
 
                         // determine side of piece
-                        char side = piece.name().charAt(0);
+                        char side = 'B';
+                        if(piece.isWhite())
+                            side = 'W';
                         int sideNumber = 0;
 
                         if (side == 'B') {
@@ -223,7 +225,8 @@ class ChessBoard {
         // determine name of piece we are moving
         // if there is a piece where we are moving
         // it wouldn't matter - we are going to capture it
-        String pieceName = fromPiece.name().substring(2);
+        System.out.println(fromPiece);
+        String pieceName = fromPiece.getMyType().toString();
         int pieceNumber = determineNumber(pieceName);
 
         // determine background color of board on both pieces
@@ -233,8 +236,11 @@ class ChessBoard {
         // determine side of piece we are moving
         // if there is a piece where we are moving
         // it wouldn't matter - we are going to capture it
-        char side = fromPiece.name().charAt(0);
-        int sideNumber = 0;
+        char side = 'B';
+        if(fromPiece.isWhite())
+            side = 'W';
+
+        int sideNumber = 0; //some of this can be cut down...
 
         if (side == 'B') {
             sideNumber = 1;
@@ -249,7 +255,7 @@ class ChessBoard {
         addColoredUnicodeCharToContainer(pieceNumber, t, sideNumber, to_bg, true);
 
         // change state to reflect these changes
-        state[f] = ChessPiece.EMPTY;
+        state[f] = new ChessPiece();
         state[t] = fromPiece;
 
         // repaint gui
