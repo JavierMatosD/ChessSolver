@@ -1,5 +1,3 @@
-package ReadFile;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -11,15 +9,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+
 //from: https://techblogstation.com/java/read-text-file-in-java/
 
 public class ChessBoardParser {
-	enum type {
-    ROOK, KNIGHT, BISHOP, QUEEN, KING, PAWN, EMPTY //replace empty with null?
-	}
 
 	public static void main(String[] args) throws Exception {
 
+        ChessPiece[][] testboard = parse("templateboard.txt");
+        /*
 		Path filePath = FileSystems.getDefault().getPath("templateboard.txt");
 		Charset charset = StandardCharsets.UTF_8;
 		try {
@@ -30,9 +28,10 @@ public class ChessBoardParser {
 		} catch (IOException ex) {
 			System.out.format("I/O Exception", ex);
 		}
+        */
 	}
 
-	public ChessPiece[][] parse (String filename) throws Exception {
+	public static ChessPiece[][] parse (String filename) throws Exception {
 
 
 		Path filePath = FileSystems.getDefault().getPath(filename);
@@ -49,7 +48,7 @@ public class ChessBoardParser {
 
        			String[] splitline = line.split(":");
        			int inboardcount = 0;
-        		for (String a: arrOfStr){
+        		for (String a: splitline){
         			if (a.equals("wp")){
         				chessPieces[count][inboardcount] = new ChessPiece(type.PAWN, false);
         			}
@@ -92,7 +91,7 @@ public class ChessBoardParser {
         			System.out.print(a);
         			inboardcount++;
         		}
-
+                System.out.println("");
         		count++;
 			}
 		
