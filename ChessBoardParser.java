@@ -14,6 +14,9 @@ import java.util.List;
 //from: https://techblogstation.com/java/read-text-file-in-java/
 
 public class ChessBoardParser {
+	enum type {
+    ROOK, KNIGHT, BISHOP, QUEEN, KING, PAWN, EMPTY //replace empty with null?
+	}
 
 	public static void main(String[] args) throws Exception {
 
@@ -31,12 +34,13 @@ public class ChessBoardParser {
 
 	public ChessPiece[][] parse (String filename) throws Exception {
 
+
 		Path filePath = FileSystems.getDefault().getPath(filename);
 		Charset charset = StandardCharsets.UTF_8;
+		ChessPiece[][] chessPieces = new ChessPiece[8][8];
 
 		try {
 			List<String> lines = Files.readAllLines(filePath, charset);
-			ChessPiece[][] chessPieces = new ChessPiece[8][8];
 			int count = 0;
 			for (String line : lines) {
 				//System.out.println(line);
@@ -97,6 +101,8 @@ public class ChessBoardParser {
 		catch (IOException ex) {
 			System.out.format("I/O Exception", ex);
 		}
+
+		return chessPieces;
 
 	}
 
