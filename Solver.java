@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  *
  */
@@ -61,36 +63,39 @@ public class Solver {
         return new Move[0];
     }
 
-    public static Move[] getRookMoves(int x, int y, ChessPiece[][] board) {
-        int counter = 0;
-        Move[] toReturn = new Move[14]; //max possible moves for a rook is 14
-        for (int i = x; i < 8; i++) {
-            if (board[i][y].getMyType() != type.EMPTY)
+    public static ArrayList<Move> getRookMoves(int x_start, int y_start, ChessPiece[][] board) {
+
+        ChessPiece rook = new ChessPiece(type.ROOK, true);
+        ArrayList<Move> moves = new ArrayList<>();
+
+        // Check right movement
+        for (int i = x_start + 1; i < 8; i++) {
+            moves.add(new Move(rook, x_start, y_start, i, y_start));
+            if (board[i][y_start].getMyType() != type.EMPTY)
                 break;
-            toReturn[counter] = new Move(board[i][y], x, y, i, y);
-            counter++;
-        }
-        for (int i = x; i >= 0; i--) {
-            if (board[i][y].getMyType() != type.EMPTY)
-                break;
-            toReturn[counter] = new Move(board[i][y], x, y, i, y);
-            counter++;
-        }
-        for (int i = y; i < 8; i++) {
-            if (board[x][i].getMyType() != type.EMPTY)
-                break;
-            toReturn[counter] = new Move(board[x][i], x, y, x, i);
-            counter++;
-        }
-        for (int i = y; i >= 0; i--) {
-            if (board[x][i].getMyType() != type.EMPTY)
-                break;
-            toReturn[counter] = new Move(board[x][i], x, y, x, i);
-            counter++;
         }
 
+        // Check left movement
+        for (int i = x_start - 1; i >= 0; i--) {
+            moves.add(new Move(rook, x_start, y_start, i, y_start));
+            if (board[i][y_start].getMyType() != type.EMPTY)
+                break;                
+        }
 
-        return toReturn;
+        // Check up movement
+        for (int i = y_start + 1; i < 8; i++) {
+            moves.add(new Move(rook, x_start, y_start, x_start, i));
+            if (board[x_start][i].getMyType() != type.EMPTY)
+                break;
+        }
+
+        // Check down movement
+        for (int i = y_start - 1; i >= 0; i--) {
+            moves.add(new Move(rook, x_start, y_start, x_start, i));
+            if (board[x_start][i].getMyType() != type.EMPTY)
+                break;
+        }
+        return moves;
     }
 
     /**
