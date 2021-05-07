@@ -9,6 +9,8 @@ public class Tests {
 
         expectedResults.put("rook_1.txt", 14); //hacky method of validation but hey it works
         expectedResults.put("rook_2.txt", 8);
+        expectedResults.put("rookcheck.txt", 6);
+
 
 
         File directoryPath = new File("testcases");

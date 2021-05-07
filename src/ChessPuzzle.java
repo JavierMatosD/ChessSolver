@@ -2,7 +2,7 @@
 
 
 import java.util.ArrayList;
-
+import java.util.Iterator;
 /**
  *
  */
@@ -32,7 +32,7 @@ public class ChessPuzzle {
      *
      * @return Array of Move's
      */
-    public ArrayList<Move> getLegalMoves() {
+    public ArrayList<Move> getLegalMovesIgnoreCheck() {
 
         ArrayList<Move> legalMoves = new ArrayList<Move>();
 
@@ -40,11 +40,29 @@ public class ChessPuzzle {
             for (int j = 0; j < 8; j++) {
                 legalMoves.addAll(getLocationLegalMoves(i, j));
             }
-
         return legalMoves;
-
     }
 
+    // Same as above, except this version ensure you can't make any moves that would put yourself in check.
+    // The above version is for checking for check; that is, you can't make a move putting yourself in check, even if the move your opp
+    // would make to take your king would put himself in check too
+    public ArrayList<Move> getLegalMoves() {
+
+        ArrayList<Move> moves = new ArrayList<Move>();
+
+        for (int i = 0; i < 8; i++)
+            for (int j = 0; j < 8; j++) {
+                moves.addAll(getLocationLegalMoves(i, j));
+            }
+
+
+        Iterator itr = moves.iterator();
+        while(itr.hasNext()){
+            if(checkCheck((Move) itr.next(), this.whiteTurn)) //if a move leads to check for the player whose turn it is, remove it
+                itr.remove();
+        }
+        return moves;
+    }
     public ArrayList<Move> getLocationLegalMoves(int x_start, int y_start) {
         ArrayList<Move> moves = new ArrayList<>();
         if(board[x_start][y_start].isWhite()!=this.whiteTurn)
@@ -65,7 +83,7 @@ public class ChessPuzzle {
 
     public ArrayList<Move> getRookMoves(int x_start, int y_start) {
 
-        ChessPiece rook = new ChessPiece(type.ROOK, true);
+        ChessPiece rook = new ChessPiece(type.ROOK, this.whiteTurn);
         ArrayList<Move> moves = new ArrayList<>();
 
         // Check right movement
@@ -120,16 +138,32 @@ public class ChessPuzzle {
         Move[] winningMoves = new Move[2];
 
         //Brute force implementation
-        ArrayList<Move> legalMoves = getLegalMoves();
+        ArrayList<Move> legalMoves = getLegalMovesIgnoreCheck();
         int counter = 0;
         for (Move move : legalMoves) {
-            if (move.checkMate(board)) {
+            if (move.check(board)) {
                 winningMoves[counter] = move;
                 counter++;
             }
         }
 
         return winningMoves;
+    }
+
+    /**    checks if the move leads to check
+     * @param move    move to be executed
+     * @param checkWhite if true, then we're looking to see if white king in check. If false, black king
+     * @return boolean, true if the king is in check
+     * //TODO: I think the functionality here should be split up
+     */
+    public boolean checkCheck(Move move, boolean checkWhite){
+        ChessPuzzle p = new ChessPuzzle(!checkWhite, move.executeMove(this.board)); //create a new puzzle that represents the state after the move is executed
+        ArrayList<Move> oppMoves = p.getLegalMovesIgnoreCheck(); //get all the moves the opponent can make
+        for(Move m: oppMoves) //iterate over those moves, see if any of them lead to capturing the king. If so, this move leads to check
+            if(m.check(p.board)){
+                return true;
+            }
+        return false;
     }
 
 
