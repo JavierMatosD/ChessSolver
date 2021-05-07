@@ -12,7 +12,7 @@ class ChessBoard {
     // unicodes for chess pieces
     static final String[] pieces = { "\u2654", "\u2655", "\u2656", "\u2657", "\u2658", "\u2659", "\u0000" };
     // mapping from piece to unicode
-    static final int KING = 0, QUEEN = 1, ROOK = 2, BISHOP = 3, KNIGHT = 4, PAWN = 5, EMPTY = 6;
+    public Map<String, Integer> pieceMapping = new HashMap<>();
 
     // colors
     public final Color outlineColor = Color.DARK_GRAY;
@@ -26,7 +26,10 @@ class ChessBoard {
     JPanel gui;
 
     // state of the board - to enable fast movement instead of repainting gui
-    ChessPiece[] state = new ChessPiece[64];
+    ChessPiece[] state = new ChessPiece[72];
+
+    // turn
+    String turn;
 
     private ArrayList<Shape> separateShapeIntoRegions(Shape shape) {
         ArrayList<Shape> regions = new ArrayList<Shape>();
@@ -119,28 +122,8 @@ class ChessBoard {
         JLabel l = new JLabel(new ImageIcon(getImageForChessPiece(piece, side, gradient)), JLabel.CENTER);
         l.setBackground(bg);
         l.setOpaque(true);
+        // this.gui.add(l);
         this.gui.add(l, index);
-    }
-
-    // mapping from piece to unicode
-    private int determineNumber(String pieceName) {
-        switch (pieceName) {
-        case "KING":
-            return 0;
-        case "QUEEN":
-            return 1;
-        case "ROOK":
-            return 2;
-        case "BISHOP":
-            return 3;
-        case "KNIGHT":
-            return 4;
-        case "PAWN":
-            return 5;
-        case "EMPTY": // empty
-            return 6;
-        }
-        return -1;
     }
 
     // determine the background on the board
@@ -161,8 +144,21 @@ class ChessBoard {
     }
 
     public ChessBoard(ChessPiece[][] chessPieces) {
-        JPanel gui = new JPanel(new GridLayout(0, 8, 0, 0));
+        JPanel gui = new JPanel(new GridLayout(10, 9));
+        String turn = "WHITE";
         this.gui = gui;
+        this.turn = turn;
+
+        String COLS = "ABCDEFGH";
+
+        // mapping from piece to unicode
+        pieceMapping.put("KING", 0);
+        pieceMapping.put("QUEEN", 1);
+        pieceMapping.put("ROOK", 2);
+        pieceMapping.put("BISHOP", 3);
+        pieceMapping.put("KNIGHT", 4);
+        pieceMapping.put("PAWN", 5);
+        pieceMapping.put("EMPTY", 6);
 
         // enables program to run later - enables us to change gui dynamically at a
         // later point after initialization
@@ -174,24 +170,38 @@ class ChessBoard {
                 // map to the static indices defined in the class
                 boolean gradientFill = true;
 
-                for (int i = 0; i < chessPieces.length; i++) {
-                    for (int j = 0; j < chessPieces[0].length; j++) {
+                for (int i = 0; i < 9; i++) {
+                    if (i == 8) {
+                        // add the letters row
+                        for (int ii = 0; ii < 8; ii++) {
+                            gui.add(new JLabel(COLS.substring(ii, ii + 1), SwingConstants.CENTER));
+                        }
+                        continue;
+                    }
+
+                    for (int j = 0; j < 9; j++) {
+                        if (j == 8) {
+                            // add the numbers column
+                            gui.add(new JLabel(String.valueOf(i + 1), SwingConstants.CENTER));
+                            continue;
+                        }
+
                         ChessPiece piece = chessPieces[i][j];
 
                         // store it in the state variable for future tracking
-                        int index = 8 * i + j;
+                        int index = 9 * i + j;
                         state[index] = piece;
-                        System.out.println(state[index]);
+                        // System.out.println(state[index]);
                         // determine name
                         String pieceName = piece.getMyType().toString();
-                        int pieceNumber = determineNumber(pieceName);
+                        int pieceNumber = pieceMapping.get(pieceName);
 
                         // determine background color of board
                         Color bg = determineBackground(i, j);
 
                         // determine side of piece
                         char side = 'B';
-                        if(piece.isWhite())
+                        if (piece.isWhite())
                             side = 'W';
                         int sideNumber = 0;
 
@@ -203,6 +213,20 @@ class ChessBoard {
                         addColoredUnicodeCharToContainer(pieceNumber, index, sideNumber, bg, gradientFill);
                     }
                 }
+
+                // some padding
+                gui.add(new JLabel(" ", SwingConstants.CENTER));
+                gui.add(new JLabel(" ", SwingConstants.CENTER));
+                gui.add(new JLabel(" ", SwingConstants.CENTER));
+                gui.add(new JLabel(" ", SwingConstants.CENTER));
+
+                JLabel turnLabel = new JLabel("TURN: ", SwingConstants.CENTER);
+                turnLabel.setFont(new Font("Serif", Font.BOLD, 16));
+                gui.add(turnLabel);
+
+                JLabel label = new JLabel(turn, SwingConstants.CENTER);
+                label.setFont(new Font("Serif", Font.BOLD, 16));
+                gui.add(label, 85);
 
                 JOptionPane.showOptionDialog(null, gui, "ChessBoard", JOptionPane.NO_OPTION, JOptionPane.NO_OPTION,
                         null, new Object[] {}, null);
@@ -216,8 +240,8 @@ class ChessBoard {
     public void move(int[] from, int[] to) {
         // converting them to jpanel coordinates
         // to find its position in the JPanel "Array"
-        int f = 8 * from[0] + from[1];
-        int t = 8 * to[0] + to[1];
+        int f = 9 * from[0] + from[1];
+        int t = 9 * to[0] + to[1];
 
         // get the pieces from state
         ChessPiece fromPiece = state[f];
@@ -227,7 +251,7 @@ class ChessBoard {
         // if there is a piece where we are moving
         // it wouldn't matter - we are going to capture it
         String pieceName = fromPiece.getMyType().toString();
-        int pieceNumber = determineNumber(pieceName);
+        int pieceNumber = pieceMapping.get(pieceName);
 
         // determine background color of board on both pieces
         Color from_bg = determineBackground(from[0], from[1]);
@@ -237,10 +261,10 @@ class ChessBoard {
         // if there is a piece where we are moving
         // it wouldn't matter - we are going to capture it
         char side = 'B';
-        if(fromPiece.isWhite())
+        if (fromPiece.isWhite())
             side = 'W';
 
-        int sideNumber = 0; //some of this can be cut down...
+        int sideNumber = 0; // some of this can be cut down...
 
         if (side == 'B') {
             sideNumber = 1;
@@ -257,6 +281,13 @@ class ChessBoard {
         // change state to reflect these changes
         state[f] = new ChessPiece();
         state[t] = fromPiece;
+
+        // change turn - test
+        turn = turn == "WHITE" ? "BLACK" : "WHITE";
+        gui.remove(85);
+        JLabel label = new JLabel(turn, SwingConstants.CENTER);
+        label.setFont(new Font("Serif", Font.BOLD, 16));
+        gui.add(label, 85);
 
         // repaint gui
         gui.revalidate();
