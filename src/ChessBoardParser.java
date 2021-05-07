@@ -12,9 +12,16 @@ import java.util.List;
 public class ChessBoardParser {
 
 	public static void main(String[] args) throws Exception {
-
-        ChessPuzzle testboard = parse("templateboard.txt");
-        ChessBoard board = new ChessBoard(testboard.board);
+		ChessPuzzle testboard = null;
+		if(args.length==0)
+         	testboard = parse("templateboard.txt");
+        else try {
+			testboard = parse(args[0]);
+		}catch (IOException e){
+        	System.err.println("Please pass a valid text file as a command line argument.");
+        	System.exit(1);
+		}
+		ChessBoard board = new ChessBoard(testboard.board);
         /*
 		Path filePath = FileSystems.getDefault().getPath("templateboard.txt");
 		Charset charset = StandardCharsets.UTF_8;
