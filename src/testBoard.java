@@ -1,6 +1,3 @@
-import java.awt.*;
-import javax.swing.*;
-
 // testing chessboard graphics
 
 public class testBoard {

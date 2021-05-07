@@ -1,4 +1,3 @@
-//maybe we should this make this a class
 public class ChessPiece{
 
     type myType;
@@ -44,3 +43,4 @@ public class ChessPiece{
 enum type {
     ROOK, KNIGHT, BISHOP, QUEEN, KING, PAWN, EMPTY //replace empty with null?
 }
+

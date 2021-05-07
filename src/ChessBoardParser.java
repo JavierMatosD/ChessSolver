@@ -1,12 +1,9 @@
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 
@@ -16,7 +13,8 @@ public class ChessBoardParser {
 
 	public static void main(String[] args) throws Exception {
 
-        ChessPiece[][] testboard = parse("templateboard.txt");
+        ChessPuzzle testboard = parse("templateboard.txt");
+        ChessBoard board = new ChessBoard(testboard.board);
         /*
 		Path filePath = FileSystems.getDefault().getPath("templateboard.txt");
 		Charset charset = StandardCharsets.UTF_8;
@@ -31,18 +29,25 @@ public class ChessBoardParser {
         */
 	}
 
-	public static ChessPiece[][] parse (String filename) throws Exception {
+	public static ChessPuzzle parse (String filename) throws Exception{
 
 
 		Path filePath = FileSystems.getDefault().getPath(filename);
 		Charset charset = StandardCharsets.UTF_8;
 		ChessPiece[][] chessPieces = new ChessPiece[8][8];
+		boolean whiteTurn = false;
 
 		try {
 			List<String> lines = Files.readAllLines(filePath, charset);
 			int count = 0;
+			String playerTurn=lines.remove(0);
+			if(playerTurn.equals("black"))
+				whiteTurn = false;
+			else if(playerTurn.equals("white"))
+				whiteTurn = true;
+			else throw new Exception("invalid puzzle, can't read player turn");
+
 			for (String line : lines) {
-				//System.out.println(line);
 
 				//https://www.w3docs.com/snippets/java/how-to-split-a-string-in-java.html
 
@@ -50,48 +55,46 @@ public class ChessBoardParser {
        			int inboardcount = 0;
         		for (String a: splitline){
         			if (a.equals("wp")){
-        				chessPieces[count][inboardcount] = new ChessPiece(type.PAWN, false);
-        			}
-        			else if (a.equals("wn")){
-        				chessPieces[count][inboardcount] = new ChessPiece(type.KNIGHT, false);
-        			}
-        			else if (a.equals("wb")){
-        				chessPieces[count][inboardcount] = new ChessPiece(type.BISHOP, false);
-        			}
-        			else if (a.equals("wr")){
-        				chessPieces[count][inboardcount] = new ChessPiece(type.ROOK, false);
-        			}
-        			else if (a.equals("wq")){
-        				chessPieces[count][inboardcount] = new ChessPiece(type.QUEEN, false);
-        			}
-        			else if (a.equals("wk")){
-        				chessPieces[count][inboardcount] = new ChessPiece(type.KING, false);
-        			}
-        			else if (a.equals("bp")){
         				chessPieces[count][inboardcount] = new ChessPiece(type.PAWN, true);
         			}
-        			else if (a.equals("bn")){
+        			else if (a.equals("wn")){
         				chessPieces[count][inboardcount] = new ChessPiece(type.KNIGHT, true);
         			}
-        			else if (a.equals("bb")){
+        			else if (a.equals("wb")){
         				chessPieces[count][inboardcount] = new ChessPiece(type.BISHOP, true);
         			}
-        			else if (a.equals("br")){
+        			else if (a.equals("wr")){
         				chessPieces[count][inboardcount] = new ChessPiece(type.ROOK, true);
         			}
-        			else if (a.equals("bq")){
+        			else if (a.equals("wq")){
         				chessPieces[count][inboardcount] = new ChessPiece(type.QUEEN, true);
         			}
-        			else if (a.equals("bk")){
+        			else if (a.equals("wk")){
         				chessPieces[count][inboardcount] = new ChessPiece(type.KING, true);
+        			}
+        			else if (a.equals("bp")){
+        				chessPieces[count][inboardcount] = new ChessPiece(type.PAWN, false);
+        			}
+        			else if (a.equals("bn")){
+        				chessPieces[count][inboardcount] = new ChessPiece(type.KNIGHT, false);
+        			}
+        			else if (a.equals("bb")){
+        				chessPieces[count][inboardcount] = new ChessPiece(type.BISHOP, false);
+        			}
+        			else if (a.equals("br")){
+        				chessPieces[count][inboardcount] = new ChessPiece(type.ROOK, false);
+        			}
+        			else if (a.equals("bq")){
+        				chessPieces[count][inboardcount] = new ChessPiece(type.QUEEN, false);
+        			}
+        			else if (a.equals("bk")){
+        				chessPieces[count][inboardcount] = new ChessPiece(type.KING, false);
         			}
         			else{
         				chessPieces[count][inboardcount] = new ChessPiece();
         			}
-        			System.out.print(a);
         			inboardcount++;
         		}
-                System.out.println("");
         		count++;
 			}
 		
@@ -101,7 +104,7 @@ public class ChessBoardParser {
 			System.out.format("I/O Exception", ex);
 		}
 
-		return chessPieces;
+		return new ChessPuzzle(whiteTurn, chessPieces);
 
 	}
 

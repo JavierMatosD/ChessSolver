@@ -1,1 +1,1 @@
-# Chess Puzzle Solver
+# Chess Puzzle ChessPuzzle

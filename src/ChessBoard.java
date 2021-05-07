@@ -1,3 +1,4 @@
+
 import java.awt.*;
 import java.awt.font.*;
 import java.awt.geom.*;
@@ -225,7 +226,6 @@ class ChessBoard {
         // determine name of piece we are moving
         // if there is a piece where we are moving
         // it wouldn't matter - we are going to capture it
-        System.out.println(fromPiece);
         String pieceName = fromPiece.getMyType().toString();
         int pieceNumber = determineNumber(pieceName);
 

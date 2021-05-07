@@ -1,4 +1,3 @@
-import java.security.PublicKey;
 
 /**
  * Move represents a single move on the chess board
@@ -27,5 +26,15 @@ public class Move
             return true;
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return chessPiece + " " + convertNumToLet(y_start) + (8-x_start) + " to " + convertNumToLet(y_end) + (8-x_end);
+
+    }
+
+    public static char convertNumToLet(int num){
+        return (char) ((int) 'a' + num);
     }
 }
