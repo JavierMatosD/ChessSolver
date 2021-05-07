@@ -1,4 +1,3 @@
-
 import java.awt.*;
 import java.awt.font.*;
 import java.awt.geom.*;
@@ -8,7 +7,7 @@ import javax.swing.border.*;
 import java.util.*;
 
 // https://stackoverflow.com/questions/18686199/fill-unicode-characters-in-labels/18686753#18686753
-class ChessBoard {
+class Gui {
     // unicodes for chess pieces
     static final String[] pieces = { "\u2654", "\u2655", "\u2656", "\u2657", "\u2658", "\u2659", "\u0000" };
     // mapping from piece to unicode
@@ -143,7 +142,7 @@ class ChessBoard {
         }
     }
 
-    public ChessBoard(ChessPiece[][] chessPieces) {
+    public Gui(ChessPiece[][] chessPieces) {
         JPanel gui = new JPanel(new GridLayout(10, 9));
         String turn = "WHITE";
         this.gui = gui;

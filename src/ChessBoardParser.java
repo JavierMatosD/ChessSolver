@@ -21,7 +21,7 @@ public class ChessBoardParser {
         	System.err.println("Please pass a valid text file as a command line argument.");
         	System.exit(1);
 		}
-		ChessBoard board = new ChessBoard(testboard.board);
+		Gui board = new Gui(testboard.board);
         /*
 		Path filePath = FileSystems.getDefault().getPath("templateboard.txt");
 		Charset charset = StandardCharsets.UTF_8;

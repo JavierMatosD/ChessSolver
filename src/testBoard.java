@@ -24,7 +24,7 @@ public class testBoard {
                 new ChessPiece(type.QUEEN, false),new ChessPiece(type.KING, false),new ChessPiece(type.BISHOP, false),
                 new ChessPiece(type.KNIGHT, false),new ChessPiece(type.ROOK, false) };
 
-        ChessBoard gui = new ChessBoard(chessPieces);
+        Gui gui = new Gui(chessPieces);
 
         try {
             Thread.sleep(1000);
