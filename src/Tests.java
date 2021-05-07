@@ -20,7 +20,7 @@ public class Tests {
             try {
                 if (runTest(ChessBoardParser.parse("testcases/" + a)) != expectedResults.get(a)) {
                     failures++;
-                    System.out.println("Test case failed!");
+                    System.out.println("Test case failed!"); //This is printing to stdout instead of stderr because intellij messes up the timing of the two output streams for some reason
                 }
             } catch (NullPointerException e) {
                 System.out.println(a + " not found in expectedResults. Did you forget to add it to the dictionary?");
