@@ -47,6 +47,8 @@ public class ChessPuzzle {
 
     public ArrayList<Move> getLocationLegalMoves(int x_start, int y_start) {
         ArrayList<Move> moves = new ArrayList<>();
+        if(board[x_start][y_start].isWhite()!=this.whiteTurn)
+            return moves;
         switch (board[x_start][y_start].getMyType()) {
             case ROOK: { //assuming the player is black
                 moves.addAll(getRookMoves(x_start, y_start));
