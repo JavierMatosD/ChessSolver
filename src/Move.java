@@ -30,6 +30,7 @@ public class Move
         for(int i = 0; i < 8; i++)
             for(int j = 0; j<8; j++)
                 toReturn[i][j] = start_state[i][j];
+        
         toReturn[x_start][y_start] = new ChessPiece();
         toReturn[x_end][y_end] = this.chessPiece;
         return toReturn;
@@ -47,7 +48,6 @@ public class Move
     @Override
     public String toString() {
         return chessPiece + " " + convertNumToLet(y_start) + (8-x_start) + " to " + convertNumToLet(y_end) + (8-x_end);
-
     }
 
     public static char convertNumToLet(int num){

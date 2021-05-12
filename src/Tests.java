@@ -31,7 +31,7 @@ public class Tests {
 
         }
         System.out.println();
-        if( failures ==0)
+        if(failures == 0)
             System.out.println("There were no failures.");
         else {
             System.err.println("There were " + failures + " failures.");
