@@ -106,34 +106,34 @@ public class ChessPuzzle {
      * @param board chess board
      * @return list of moves
      */
-    public ArrayList<Move> getKingMoves(int x, int y, ChessPiece[][] board) {
+    public ArrayList<Move> getKingMoves(int row, int col, ChessPiece[][] board) {
         ArrayList<Move> moves = new ArrayList<>();
         ChessPiece king = new ChessPiece(type.KING, this.whiteTurn);
 
-        // Check left and right
-        // Ensure that moves is within the bounds of the board and that the space is either empty or enemy
-        if (x + 1 < 8 && (board[x + 1][y].getMyType() == type.EMPTY || board[x + 1][y].isWhite() != this.whiteTurn))
-            moves.add(new Move(king, x, y, x + 1, y));
-        if (x - 1 >= 0 && (board[x - 1][y].getMyType() == type.EMPTY || board[x - 1][y].isWhite() != this.whiteTurn))
-            moves.add(new Move(king, x, y, x - 1, y));
-        
         // Check up and down
-        if (y + 1 < 8 && (board[x][y + 1].getMyType() == type.EMPTY || board[x][y + 1].isWhite() != this.whiteTurn))
-            moves.add(new Move(king, x, y, x, y + 1));
-        if (y - 1 >= 0 && (board[x][y - 1].getMyType() == type.EMPTY || board[x][y - 1].isWhite() != this.whiteTurn))
-            moves.add(new Move(king, x, y, x, y - 1));
+        // Ensure that moves is within the bounds of the board and that the space is either empty or enemy
+        if (row + 1 < 8 && (board[row + 1][col].getMyType() == type.EMPTY || board[row + 1][col].isWhite() != this.whiteTurn))
+            moves.add(new Move(king, row, col, row + 1, col));
+        if (row - 1 >= 0 && (board[row - 1][col].getMyType() == type.EMPTY || board[row - 1][col].isWhite() != this.whiteTurn))
+            moves.add(new Move(king, row, col, row - 1, col));
         
-        // Check diagonal up/left and up/right
-        if (x + 1 < 8 && y + 1 < 8 && (board[x + 1][y + 1].getMyType() == type.EMPTY || board[x + 1][y + 1].isWhite() != this.whiteTurn))
-            moves.add(new Move(king, x, y, x + 1, y + 1));
-        if (x - 1 >= 0 && y + 1 < 8&& (board[x - 1][y + 1].getMyType() == type.EMPTY || board[x - 1][y + 1].isWhite() != this.whiteTurn))
-            moves.add(new Move(king, x, y, x - 1, y + 1));
+        // Check right and left
+        if (col + 1 < 8 && (board[row][col + 1].getMyType() == type.EMPTY || board[row][col + 1].isWhite() != this.whiteTurn))
+            moves.add(new Move(king, row, col, row, col + 1));
+        if (col - 1 >= 0 && (board[row][col - 1].getMyType() == type.EMPTY || board[row][col - 1].isWhite() != this.whiteTurn))
+            moves.add(new Move(king, row, col, row, col - 1));
         
-        // Check diagonal down/left and down/right
-        if (x - 1 >= 0 && y - 1 >=0 && (board[x-1][y-1].getMyType() == type.EMPTY || board[x-1][y-1].isWhite() != this.whiteTurn))
-            moves.add(new Move(king, x, y, x - 1, y - 1));
-        if (x + 1 < 8 && y - 1 >= 0 && (board[x + 1][y - 1].getMyType() == type.EMPTY || board[x + 1][y - 1].isWhite() != this.whiteTurn))
-            moves.add(new Move(king, x, y, x + 1, y - 1));
+        // Check diagonal up/right and down/right
+        if (row + 1 < 8 && col + 1 < 8 && (board[row + 1][col + 1].getMyType() == type.EMPTY || board[row + 1][col + 1].isWhite() != this.whiteTurn))
+            moves.add(new Move(king, row, col, row + 1, col + 1));
+        if (row - 1 >= 0 && col + 1 < 8&& (board[row - 1][col + 1].getMyType() == type.EMPTY || board[row - 1][col + 1].isWhite() != this.whiteTurn))
+            moves.add(new Move(king, row, col, row - 1, col + 1));
+        
+        // Check diagonal up/left and down/left
+        if (row - 1 >= 0 && col - 1 >=0 && (board[row-1][col-1].getMyType() == type.EMPTY || board[row-1][col-1].isWhite() != this.whiteTurn))
+            moves.add(new Move(king, row, col, row - 1, col - 1));
+        if (row + 1 < 8 && col - 1 >= 0 && (board[row + 1][col - 1].getMyType() == type.EMPTY || board[row + 1][col - 1].isWhite() != this.whiteTurn))
+            moves.add(new Move(king, row, col, row + 1, col - 1));
         
         return moves;
     }
@@ -145,7 +145,7 @@ public class ChessPuzzle {
      * @param board chess board
      * @return list of moves
      */
-    public ArrayList<Move> getKnightMoves(int x, int y, ChessPiece[][] board) {
+    public ArrayList<Move> getKnightMoves(int row, int col, ChessPiece[][] board) {
         ArrayList<Move> moves = new ArrayList<>();
         ChessPiece knight = new ChessPiece(type.KNIGHT, this.whiteTurn);
 
@@ -154,35 +154,35 @@ public class ChessPuzzle {
         // |
 
         // Ensure move is within bounds of the board and that the new space is either empty or enemy
-        if (x - 2 >= 0 && y + 1 < 8 && (board[x-2][y+1].getMyType() == type.EMPTY || board[x-2][y+1].isWhite() != this.whiteTurn))
-            moves.add(new Move(knight, x, y, x - 2, y + 1));
-        if (x - 2 >= 0 && y - 1 >= 0 && (board[x-2][y-1].getMyType() == type.EMPTY || board[x-2][y-1].isWhite() != this.whiteTurn))
-            moves.add(new Move(knight, x, y, x - 2, y - 1));
+        if (row - 1 >= 0 && col - 2 >= 0 && (board[row-1][col-2].getMyType() == type.EMPTY || board[row-1][col-2].isWhite() != this.whiteTurn))
+            moves.add(new Move(knight, row, col, row - 1, col - 2));
+        if (row + 1 < 8 && col - 2 >= 0 && (board[row+1][col-2].getMyType() == type.EMPTY || board[row+1][col-2].isWhite() != this.whiteTurn))
+            moves.add(new Move(knight, row, col, row + 1, col - 2));
         
         // (two spaces to the right and one up or down)
         // _ _ |
         //     |
-        if (x + 2 < 8 && y + 1 < 8 && (board[x+2][y+1].getMyType() == type.EMPTY || board[x+2][y+1].isWhite() != this.whiteTurn))
-            moves.add(new Move(knight, x, y, x + 2, y + 1));
-        if (x + 2 < 8 && y - 1 >= 0 && (board[x+2][y-1].getMyType() == type.EMPTY || board[x + 2][y - 1].isWhite() != this.whiteTurn))
-            moves.add(new Move(knight, x, y, x + 2, y - 1));
+        if (row - 1 >= 0 && col + 2 < 8 && (board[row-1][col+2].getMyType() == type.EMPTY || board[row-1][col+2].isWhite() != this.whiteTurn))
+            moves.add(new Move(knight, row, col, row -1, col + 2));
+        if (row + 1 < 8 && col + 2 < 8 && (board[row+1][col+2].getMyType() == type.EMPTY || board[row - 1][col + 2].isWhite() != this.whiteTurn))
+            moves.add(new Move(knight, row, col, row + 1, col + 2));
 
         // (two spaces up and one left or right
         //  _ _
         //   |
         //   |
-        if (x - 1 >= 0 &&  y + 2 < 8 && (board[x-1][y+2].getMyType() == type.EMPTY || board[x - 1][y + 2].isWhite() != this.whiteTurn))
-            moves.add(new Move(knight, x, y, x - 1, y + 2));
-        if (x + 1 < 8 && y + 2 < 8  && (board[x+1][y+2].getMyType() == type.EMPTY || board[x + 1][y + 2].isWhite() != this.whiteTurn))
-            moves.add(new Move(knight, x, y, x + 1, y + 2));
+        if (row - 2 >= 0 &&  col + 1 < 8 && (board[row-2][col+1].getMyType() == type.EMPTY || board[row - 2][col + 1].isWhite() != this.whiteTurn))
+            moves.add(new Move(knight, row, col, row - 2, col + 1));
+        if (row - 2 >= 0 && col - 1 >= 0  && (board[row-2][col-1].getMyType() == type.EMPTY || board[row -2][col -1].isWhite() != this.whiteTurn))
+            moves.add(new Move(knight, row, col, row -2, col -1));
 
         // (two spaces down and one to left or right)
         //  |
         // _|_
-        if (x - 1 >= 0 && y - 2 >= 0 && (board[x-1][y-2].getMyType() == type.EMPTY || board[x - 1][y - 2].isWhite() != this.whiteTurn))
-            moves.add(new Move(knight, x, y, x - 1, y - 2));
-        if (x + 1 < 8 && y - 2 >= 0 && (board[x+1][y-2].getMyType() == type.EMPTY || board[x + 1][y - 2].isWhite() != this.whiteTurn))
-            moves.add(new Move(knight, x, y, x + 1, y - 2));
+        if (row + 2 < 8 && col + 1 < 8 && (board[row+2][col+1].getMyType() == type.EMPTY || board[row+2][col+1].isWhite() != this.whiteTurn))
+            moves.add(new Move(knight, row, col, row+2, col+1));
+        if (row + 2 < 8 && col - 1 >= 0 && (board[row+2][col-1].getMyType() == type.EMPTY || board[row + 2][col - 1].isWhite() != this.whiteTurn))
+            moves.add(new Move(knight, row, col, row + 2, col - 1));
         
         return moves;
     }
@@ -242,66 +242,77 @@ public class ChessPuzzle {
 
         //----------Check Diagonal Movement--------------//
         // temp variable so as to not modify original y
+        // temp variable so as to not modify original col
+       // temp variable so as to not modify original col
         int tempY = y;
 
         // Check up / right
-        for (int i = x; i < board.length; i++) {
+        for (int i = x; i >= 0; i--) {
             // Check if it is not empty
-            if (board[i + 1][tempY + 1].getMyType() != type.EMPTY) {
-                // Check if piece is from other side
-                if (board[i + 1][tempY + 1].isWhite() != this.whiteTurn)
-                    moves.add(new Move(queen, x, y, i + 1, tempY + 1));
-                break;
+            if (tempY + 1 < 8 && i - 1 >= 0) {
+                if (board[i - 1][tempY + 1].getMyType() != type.EMPTY) {
+                    // Check if piece is from other side
+                    if (board[i - 1][tempY + 1].isWhite() != this.whiteTurn)
+                        moves.add(new Move(queen, x, y, i - 1, tempY + 1));
+                    break;
+                }
+                moves.add(new Move(queen, x, y, i - 1, tempY + 1));
+                tempY++;
             }
-            moves.add(new Move(queen, x, y, i + 1, tempY + 1));
-            tempY++;
         }
 
         //rest tempY
         tempY = y; 
 
         // check up / left
-        for (int i = x; i < board.length; i--) {
+        for (int i = x; i >= 1; i--) {
             // Check if it is not empty
-            if (board[i - 1][tempY + 1].getMyType() != type.EMPTY) {
-                // Check if piece is from other side
-                if (board[i - 1][tempY + 1].isWhite() != this.whiteTurn)
-                    moves.add(new Move(queen, x, y, i - 1, tempY + 1));
-                break;
+            if (tempY - 1 >= 0) {
+                if (board[i - 1][tempY - 1].getMyType() != type.EMPTY) {
+                    // Check if piece is from other side
+                    if (board[i - 1][tempY - 1].isWhite() != this.whiteTurn)
+                        moves.add(new Move(queen, x, y, i - 1, tempY - 1));
+                    break;
+                }
+                moves.add(new Move(queen, x, y, i - 1, tempY - 1));
+                tempY--;
             }
-            moves.add(new Move(queen, x, y, i - 1, tempY + 1));
-            tempY++;
         }
 
         tempY = y; 
         
         // down / right
-        for (int i = x; i < board.length; i++) {
+        for (int i = x; i < 8; i++) {
             // Check if it is not empty
-            if (board[i + 1][tempY - 1].getMyType() != type.EMPTY) {
-                // Check if piece is from other side
-                if (board[i + 1][tempY - 1].isWhite() != this.whiteTurn)
-                    moves.add(new Move(queen, x, y, i + 1, tempY - 1));
-                break;
+            if (tempY + 1 < 8 && i + 1 < 8) {
+                if (board[i + 1][tempY + 1].getMyType() != type.EMPTY) {
+                    // Check if piece is from other side
+                    if (board[i + 1][tempY + 1].isWhite() != this.whiteTurn)
+                        moves.add(new Move(queen, x, y, i + 1, tempY + 1));
+                    break;
+                }
+                moves.add(new Move(queen, x, y, i + 1, tempY + 1));
+                tempY++;
             }
-            moves.add(new Move(queen, x, y, i + 1, tempY - 1));
-            tempY++;
         }
 
         tempY = y; 
 
         // down / left
-        for (int i = x; i < board.length; i--) {
+        for (int i = x; i < 8; i++) {
             // Check if it is not empty
-            if (board[i - 1][tempY - 1].getMyType() != type.EMPTY) {
-                // Check if piece is from other side
-                if (board[i - 1][tempY - 1].isWhite() != this.whiteTurn)
-                    moves.add(new Move(queen, x, y, i - 1, tempY - 1));
-                break;
+            if (tempY - 1 >= 0) {
+                if (board[i + 1][tempY - 1].getMyType() != type.EMPTY) {
+                    // Check if piece is from other side
+                    if (board[i + 1][tempY - 1].isWhite() != this.whiteTurn)
+                        moves.add(new Move(queen, x, y, i + 1, tempY - 1));
+                    break;
+                }
+                moves.add(new Move(queen, x, y, i + 1, tempY - 1));
+                tempY--;
             }
-            moves.add(new Move(queen, x, y, i - 1, tempY - 1));
-            tempY++;
         }
+
         return moves;
     }
     
@@ -313,71 +324,79 @@ public class ChessPuzzle {
      * @param board chess board
      * @return list of moves
      */
-    public ArrayList<Move> getBishopMoves(int x, int y, ChessPiece[][] board) {
+    public ArrayList<Move> getBishopMoves(int row, int col, ChessPiece[][] board) {
         
         ArrayList<Move> moves = new ArrayList<>();
         ChessPiece bishop = new ChessPiece(type.BISHOP, this.whiteTurn);
 
-        // temp variable so as to not modify original y
-        int tempY = y;
+        // temp variable so as to not modify original col
+        int tempCol = col;
 
         // Check up / right
-        for (int i = x; i < board.length; i++) {
+        for (int i = row; i >= 0; i--) {
             // Check if it is not empty
-            if (board[i + 1][tempY + 1].getMyType() != type.EMPTY) {
-                // Check if piece is from other side
-                if (board[i + 1][tempY + 1].isWhite() != this.whiteTurn)
-                    moves.add(new Move(bishop, x, y, i + 1, tempY + 1));
-                break;
+            if (tempCol + 1 < 8 && i - 1 >= 0) {
+                if (board[i - 1][tempCol + 1].getMyType() != type.EMPTY) {
+                    // Check if piece is from other side
+                    if (board[i - 1][tempCol + 1].isWhite() != this.whiteTurn)
+                        moves.add(new Move(bishop, row, col, i - 1, tempCol + 1));
+                    break;
+                }
+                moves.add(new Move(bishop, row, col, i - 1, tempCol + 1));
+                tempCol++;
             }
-            moves.add(new Move(bishop, x, y, i + 1, tempY + 1));
-            tempY++;
         }
 
-        //rest tempY
-        tempY = y; 
+        //rest tempCol
+        tempCol = col; 
 
         // check up / left
-        for (int i = x; i < board.length; i--) {
+        for (int i = row; i >= 1; i--) {
             // Check if it is not empty
-            if (board[i - 1][tempY + 1].getMyType() != type.EMPTY) {
-                // Check if piece is from other side
-                if (board[i - 1][tempY + 1].isWhite() != this.whiteTurn)
-                    moves.add(new Move(bishop, x, y, i - 1, tempY + 1));
-                break;
+            if (tempCol - 1 >= 0) {
+                if (board[i - 1][tempCol - 1].getMyType() != type.EMPTY) {
+                    // Check if piece is from other side
+                    if (board[i - 1][tempCol - 1].isWhite() != this.whiteTurn)
+                        moves.add(new Move(bishop, row, col, i - 1, tempCol - 1));
+                    break;
+                }
+                moves.add(new Move(bishop, row, col, i - 1, tempCol - 1));
+                tempCol--;
             }
-            moves.add(new Move(bishop, x, y, i - 1, tempY + 1));
-            tempY++;
         }
 
-        tempY = y; 
+        tempCol = col; 
         
         // down / right
-        for (int i = x; i < board.length; i++) {
+        for (int i = row; i < 8; i++) {
             // Check if it is not empty
-            if (board[i + 1][tempY - 1].getMyType() != type.EMPTY) {
-                // Check if piece is from other side
-                if (board[i + 1][tempY - 1].isWhite() != this.whiteTurn)
-                    moves.add(new Move(bishop, x, y, i + 1, tempY - 1));
-                break;
+            if (tempCol + 1 < 8 && i + 1 < 8) {
+                if (board[i + 1][tempCol + 1].getMyType() != type.EMPTY) {
+                    // Check if piece is from other side
+                    if (board[i + 1][tempCol + 1].isWhite() != this.whiteTurn)
+                        moves.add(new Move(bishop, row, col, i + 1, tempCol + 1));
+                    break;
+                }
+                moves.add(new Move(bishop, row, col, i + 1, tempCol + 1));
+                tempCol++;
             }
-            moves.add(new Move(bishop, x, y, i + 1, tempY - 1));
-            tempY++;
         }
 
-        tempY = y; 
+        tempCol = col; 
 
         // down / left
-        for (int i = x; i < board.length; i--) {
+        for (int i = row; i < 8; i++) {
             // Check if it is not empty
-            if (board[i - 1][tempY - 1].getMyType() != type.EMPTY) {
-                // Check if piece is from other side
-                if (board[i - 1][tempY - 1].isWhite() != this.whiteTurn)
-                    moves.add(new Move(bishop, x, y, i - 1, tempY - 1));
-                break;
+            if (tempCol - 1 >= 0) {
+                if (board[i + 1][tempCol - 1].getMyType() != type.EMPTY) {
+                    // Check if piece is from other side
+                    if (board[i + 1][tempCol - 1].isWhite() != this.whiteTurn)
+                        moves.add(new Move(bishop, row, col, i + 1, tempCol - 1));
+                    break;
+                }
+                moves.add(new Move(bishop, row, col, i + 1, tempCol - 1));
+                tempCol--;
             }
-            moves.add(new Move(bishop, x, y, i - 1, tempY - 1));
-            tempY++;
         }
 
 
@@ -391,33 +410,32 @@ public class ChessPuzzle {
      * @param board chess board
      * @return list of moves
      */
-    public ArrayList<Move> getPawnMoves(int x, int y, ChessPiece[][] board) {
+    public ArrayList<Move> getPawnMoves(int row, int col, ChessPiece[][] board) {
 
         ArrayList<Move> moves = new ArrayList<>();
         ChessPiece pawn = new ChessPiece(type.PAWN, this.whiteTurn);
-        boolean firstMove = (x == 6) ?  true : false;
-
+        boolean firstMove = (row == 6) ? true : false;
+        
 
         // check one forward movement
-        if (board[x][y + 1].getMyType() == type.EMPTY) {
-            moves.add(new Move(pawn, x, y, x, y + 1));
-            // check two forward
-            if (firstMove)
-                if (board[x][y + 2].getMyType() == type.EMPTY)
-                    moves.add(new Move(pawn, x, y, x, y + 2));
-        }
+        if (row - 1 >= 0  && board[row - 1][col].getMyType() == type.EMPTY)
+            moves.add(new Move(pawn, row, col, row - 1, col));
+        
+        // check two forward
+        if (row - 2 >= 0 && firstMove)
+            if (board[row - 2][col].getMyType() == type.EMPTY)
+                moves.add(new Move(pawn, row, col, row - 2, col));
 
         //                  check captures
         // right and up
-        if (board[x + 1][y + 1].getMyType() != type.EMPTY)
-            // check if piece is from other side
-            if (board[x + 1][y + 1].isWhite != this.whiteTurn)
-                moves.add(new Move(pawn, x, y, x + 1, y + 1));
+        if (row - 1 >= 0 && col + 1 < 8 && board[row - 1][col + 1].getMyType() != type.EMPTY)
+            if (board[row - 1][col + 1].isWhite() != this.whiteTurn)
+                moves.add(new Move(pawn, row, col, row - 1, col + 1));
         
         // left and up
-        if (board[x - 1][y + 1].getMyType() != type.EMPTY)
-            if (board[x - 1][y + 1].isWhite != this.whiteTurn)
-                moves.add(new Move(pawn, x, y, x - 1, y + 1));
+        if (row -  1 >= 0 && col - 1 >= 0 && board[row - 1][col - 1].getMyType() != type.EMPTY)
+            if (board[row - 1][col - 1].isWhite() != this.whiteTurn)
+                moves.add(new Move(pawn, row, col, row - 1, col - 1));
 
         return moves;
     }
