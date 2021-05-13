@@ -10,7 +10,11 @@ public class Tests {
         expectedResults.put("rook_1.txt", 14); //hacky method of validation but hey it works
         expectedResults.put("rook_2.txt", 8);
         expectedResults.put("rookcheck.txt", 6);
-
+        expectedResults.put("pawn_1.txt", 4);
+        expectedResults.put("bishop_1.txt", 13);
+        expectedResults.put("knight_1.txt", 8);
+        expectedResults.put("king_1.txt", 8);
+        expectedResults.put("queen_1.txt", 27);
 
 
         File directoryPath = new File("testcases");
@@ -31,7 +35,7 @@ public class Tests {
 
         }
         System.out.println();
-        if( failures ==0)
+        if(failures == 0)
             System.out.println("There were no failures.");
         else {
             System.err.println("There were " + failures + " failures.");
