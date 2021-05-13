@@ -16,6 +16,25 @@ public class ChessPuzzle {
 
     }
 
+    //returns the first move found resulting in checkmate
+    public Move solvePuzzle(){
+        ArrayList<Move> legalMoves = this.getLegalMoves();
+        Iterator itr = legalMoves.iterator();
+        while (itr.hasNext()) {
+            if (!checkCheck((Move) itr.next(), !this.whiteTurn)) //if a move does not lead to check on the opposing king, remove it
+                itr.remove();
+        }
+        ChessPuzzle p;
+        for(Move m: legalMoves) {
+            p = new ChessPuzzle(!this.whiteTurn, m.executeMove(this.board)); //create a new puzzle that represents the state after the move is executed
+            if(p.getLegalMoves().size()==0)
+                return m;
+        }
+        return null;
+    }
+
+
+
     /**
      * Legal moves for each piece
      * Kings  : One square space in any direction as long as the square cannot be attacked by another piece.
@@ -71,29 +90,35 @@ public class ChessPuzzle {
         ArrayList<Move> moves = new ArrayList<>();
         if (board[x_start][y_start].isWhite() != this.whiteTurn)
             return moves;
-        switch (board[x_start][y_start].getMyType()) {
-            case ROOK: //assuming the player is black
-                moves.addAll(getRookMoves(x_start, y_start));
-                break;
-            case BISHOP:
-                moves.addAll(getBishopMoves(x_start, y_start, board));
-                break;
-            case KING:
-                moves.addAll(getKingMoves(x_start, y_start, board));
-                break;
-            case KNIGHT:
-                moves.addAll(getKnightMoves(x_start, y_start, board));
-                break;
-            case PAWN:
-                moves.addAll(getPawnMoves(x_start, y_start, board));
-                break;
-            case QUEEN:
-                moves.addAll(getQueenMoves(x_start, y_start, board));
-                break;
-            case EMPTY:
-                break;
-            default:
-                break;
+        try {
+            switch (board[x_start][y_start].getMyType()) {
+                case ROOK: //assuming the player is black
+                    moves.addAll(getRookMoves(x_start, y_start));
+                    break;
+                case BISHOP:
+                    moves.addAll(getBishopMoves(x_start, y_start, board));
+                    break;
+                case KING:
+                    moves.addAll(getKingMoves(x_start, y_start, board));
+                    break;
+                case KNIGHT:
+                    moves.addAll(getKnightMoves(x_start, y_start, board));
+                    break;
+                case PAWN:
+                    moves.addAll(getPawnMoves(x_start, y_start, board));
+                    break;
+                case QUEEN:
+                    moves.addAll(getQueenMoves(x_start, y_start, board));
+                    break;
+                case EMPTY:
+                    break;
+                default:
+                    break;
+            }
+        } catch (Exception e){
+            Gui board = new Gui(this.board);
+            System.out.println(e.getMessage());
+            return null;
         }
 
         return moves;
@@ -282,7 +307,7 @@ public class ChessPuzzle {
         tempY = y; 
         
         // down / right
-        for (int i = x; i < 8; i++) {
+        for (int i = x; i < 7; i++) {
             // Check if it is not empty
             if (tempY + 1 < 8 && i + 1 < 8) {
                 if (board[i + 1][tempY + 1].getMyType() != type.EMPTY) {
@@ -296,10 +321,10 @@ public class ChessPuzzle {
             }
         }
 
-        tempY = y; 
+        tempY = y;
 
         // down / left
-        for (int i = x; i < 8; i++) {
+        for (int i = x; i < 7; i++) {
             // Check if it is not empty
             if (tempY - 1 >= 0) {
                 if (board[i + 1][tempY - 1].getMyType() != type.EMPTY) {
@@ -368,7 +393,7 @@ public class ChessPuzzle {
         tempCol = col; 
         
         // down / right
-        for (int i = row; i < 8; i++) {
+        for (int i = row; i < 7; i++) {
             // Check if it is not empty
             if (tempCol + 1 < 8 && i + 1 < 8) {
                 if (board[i + 1][tempCol + 1].getMyType() != type.EMPTY) {
@@ -385,7 +410,7 @@ public class ChessPuzzle {
         tempCol = col; 
 
         // down / left
-        for (int i = row; i < 8; i++) {
+        for (int i = row; i < 7; i++) {
             // Check if it is not empty
             if (tempCol - 1 >= 0) {
                 if (board[i + 1][tempCol - 1].getMyType() != type.EMPTY) {
@@ -537,5 +562,6 @@ public class ChessPuzzle {
         return false;
     }
 
+//TODO: a toString for debugging?
 
 }

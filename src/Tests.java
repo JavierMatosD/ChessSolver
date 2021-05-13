@@ -15,6 +15,9 @@ public class Tests {
         expectedResults.put("knight_1.txt", 8);
         expectedResults.put("king_1.txt", 8);
         expectedResults.put("queen_1.txt", 27);
+        expectedResults.put("queen_2.txt", 21);
+        expectedResults.put("rook_3.txt", 14);
+
 
 
         File directoryPath = new File("testcases");
