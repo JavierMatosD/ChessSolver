@@ -52,17 +52,6 @@ public class ChessPuzzle {
 
     }
 
-//    public void executeMove(Move m){
-//        if(!board[m.x_start][m.y_start].equals(m.chessPiece)) {
-//            System.out.println("Tried to execute move " + m + " but " + board[m.x_start][m.y_start] + " was the piece found in the starting spot");
-//            Gui gui = new Gui(this.board);
-//
-////            System.exit(1);
-//        }
-//
-//        board[m.x_start][m.y_start] = new ChessPiece();
-//        board[m.x_end][m.y_end] = m.chessPiece;
-//    }
 
     //returns the first move found resulting in checkmate
     public Move solvePuzzle() {
@@ -107,9 +96,11 @@ public class ChessPuzzle {
         return legalMoves;
     }
 
-    // Same as above, except this version ensure you can't make any moves that would put yourself in check.
-    // The above version is for checking for check; that is, you can't make a move putting yourself in check, even if the move your opp
-    // would make to take your king would put himself in check too
+    /**
+     * Same as above, except this version ensure you can't make any moves that would put yourself in check. 
+     * The above version is for checking for check; that is, you can't make a move putting yourself in check, even if the move your opp
+     * would make to take your king would put himself in check too
+    */
     public ArrayList<Move> getLegalMoves() {
 
         ArrayList<Move> moves = new ArrayList<Move>();

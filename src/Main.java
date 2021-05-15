@@ -7,7 +7,7 @@ public class Main {
     public static void main(String[] args) throws Exception{
         ChessPuzzle puzzle = null;
         if(args.length==0)
-            puzzle = ChessBoardParser.parse("puzzles/puzzle3.txt");
+            puzzle = ChessBoardParser.parse("../puzzles/puzzle3.txt");
         else try {
             puzzle = ChessBoardParser.parse(args[0]);
         }catch (IOException e){
