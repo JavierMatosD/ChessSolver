@@ -7,7 +7,7 @@ import javax.swing.border.*;
 import java.util.*;
 
 // https://stackoverflow.com/questions/18686199/fill-unicode-characters-in-labels/18686753#18686753
-class Gui {
+class Gui extends JFrame {
     // unicodes for chess pieces
     static final String[] pieces = { "\u2654", "\u2655", "\u2656", "\u2657", "\u2658", "\u2659", "\u0000" };
     // mapping from piece to unicode
@@ -21,14 +21,19 @@ class Gui {
     // font
     static Font font = new Font("Sans-Serif", Font.PLAIN, 64);
 
-    // gui
-    JPanel gui;
+    // boardPanel
+    JPanel boardPanel;
+    // keeps all the moves made
+    DefaultListModel<String> movesModel;
 
     // state of the board - to enable fast movement instead of repainting gui
     ChessPiece[] state = new ChessPiece[72];
 
     // turn
     String turn;
+
+    // labels
+    String[] COLS = "ABCDEFGH".split("");
 
     private ArrayList<Shape> separateShapeIntoRegions(Shape shape) {
         ArrayList<Shape> regions = new ArrayList<Shape>();
@@ -122,7 +127,7 @@ class Gui {
         l.setBackground(bg);
         l.setOpaque(true);
         // this.gui.add(l);
-        this.gui.add(l, index);
+        this.boardPanel.add(l, index);
     }
 
     // determine the background on the board
@@ -143,14 +148,7 @@ class Gui {
     }
 
     public Gui(ChessPiece[][] chessPieces) {
-        JPanel gui = new JPanel(new GridLayout(10, 9));
-        String turn = "WHITE";
-        this.gui = gui;
-        this.turn = turn;
-
-        String COLS = "ABCDEFGH";
-
-        // mapping from piece to unicode
+        // initialize mapping from piece to unicode
         pieceMapping.put("KING", 0);
         pieceMapping.put("QUEEN", 1);
         pieceMapping.put("ROOK", 2);
@@ -159,12 +157,35 @@ class Gui {
         pieceMapping.put("PAWN", 5);
         pieceMapping.put("EMPTY", 6);
 
+        // GUI will hold two panels
+        // 1. Board 2. Moves
+        JPanel gui = new JPanel();
+        gui.setLayout(new GridLayout(1, 2));
+
+        // 1. boardPanel
+        JPanel boardPanel = new JPanel(new GridLayout(10, 9));
+        String turn = "WHITE";
+        this.boardPanel = boardPanel;
+        this.turn = turn;
+
+        // 2. movesPanel
+        // keep track of moves
+        JScrollPane movesPane = new JScrollPane();
+        // dynamic list
+        this.movesModel = new DefaultListModel<String>();
+        JList<String> movesList = new JList<String>(this.movesModel);
+        // add the moves panel
+        // Initialize the list with items
+        movesModel.addElement("MOVES");
+        movesModel.addElement(" ");
+        movesPane.setViewportView(movesList);
+
         // enables program to run later - enables us to change gui dynamically at a
         // later point after initialization
         Runnable r = new Runnable() {
             @Override
             public void run() {
-                gui.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.GRAY.brighter(), Color.GRAY,
+                boardPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.GRAY.brighter(), Color.GRAY,
                         Color.GRAY.darker(), Color.GRAY));
                 // map to the static indices defined in the class
                 boolean gradientFill = true;
@@ -173,7 +194,7 @@ class Gui {
                     if (i == 8) {
                         // add the letters row
                         for (int ii = 0; ii < 8; ii++) {
-                            gui.add(new JLabel(COLS.substring(ii, ii + 1), SwingConstants.CENTER));
+                            boardPanel.add(new JLabel(COLS[ii], SwingConstants.CENTER));
                         }
                         continue;
                     }
@@ -181,7 +202,7 @@ class Gui {
                     for (int j = 0; j < 9; j++) {
                         if (j == 8) {
                             // add the numbers column
-                            gui.add(new JLabel(String.valueOf(i + 1), SwingConstants.CENTER));
+                            boardPanel.add(new JLabel(String.valueOf(9 - (i + 1)), SwingConstants.CENTER));
                             continue;
                         }
 
@@ -214,18 +235,22 @@ class Gui {
                 }
 
                 // some padding
-                gui.add(new JLabel(" ", SwingConstants.CENTER));
-                gui.add(new JLabel(" ", SwingConstants.CENTER));
-                gui.add(new JLabel(" ", SwingConstants.CENTER));
-                gui.add(new JLabel(" ", SwingConstants.CENTER));
+                boardPanel.add(new JLabel(" ", SwingConstants.CENTER));
+                boardPanel.add(new JLabel(" ", SwingConstants.CENTER));
+                boardPanel.add(new JLabel(" ", SwingConstants.CENTER));
+                boardPanel.add(new JLabel(" ", SwingConstants.CENTER));
 
                 JLabel turnLabel = new JLabel("TURN: ", SwingConstants.CENTER);
                 turnLabel.setFont(new Font("Serif", Font.BOLD, 16));
-                gui.add(turnLabel);
+                boardPanel.add(turnLabel);
 
                 JLabel label = new JLabel(turn, SwingConstants.CENTER);
                 label.setFont(new Font("Serif", Font.BOLD, 16));
-                gui.add(label, 85);
+                boardPanel.add(label, 85);
+
+                // add the two componenets to the GUI
+                gui.add(boardPanel);
+                gui.add(movesPane);
 
                 JOptionPane.showOptionDialog(null, gui, "ChessBoard", JOptionPane.NO_OPTION, JOptionPane.NO_OPTION,
                         null, new Object[] {}, null);
@@ -270,26 +295,30 @@ class Gui {
         }
 
         // replace from with empty box
-        gui.remove(f);
+        boardPanel.remove(f);
         addColoredUnicodeCharToContainer(6, f, 0, from_bg, true);
 
         // replace to with from piece
-        gui.remove(t);
+        boardPanel.remove(t);
         addColoredUnicodeCharToContainer(pieceNumber, t, sideNumber, to_bg, true);
 
         // change state to reflect these changes
         state[f] = new ChessPiece();
         state[t] = fromPiece;
 
+        // add to movesList
+        this.movesModel.addElement(
+                turn + " " + pieceName + " -> " + COLS[from[1]] + (8 - from[0]) + " : " + COLS[to[1]] + (8 - to[0]));
+
         // change turn - test
         turn = turn == "WHITE" ? "BLACK" : "WHITE";
-        gui.remove(85);
+        boardPanel.remove(85);
         JLabel label = new JLabel(turn, SwingConstants.CENTER);
         label.setFont(new Font("Serif", Font.BOLD, 16));
-        gui.add(label, 85);
+        boardPanel.add(label, 85);
 
-        // repaint gui
-        gui.revalidate();
-        gui.repaint();
+        // repaint boardPanel only
+        boardPanel.revalidate();
+        boardPanel.repaint();
     }
 }
