@@ -23,6 +23,10 @@ public class ChessPiece{
         this.myType = myType;
     }
 
+    public boolean isEmpty() {
+        return myType==type.EMPTY;
+    }
+
 
     public boolean isWhite() {
         return isWhite;

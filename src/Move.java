@@ -21,6 +21,8 @@ public class Move
         this.x_end = x_end;
     }
 
+
+
     public ChessPiece[][] executeMove(ChessPiece[][] start_state){
         if(!start_state[x_start][y_start].equals(this.chessPiece)) {
             System.out.println("Tried to execute move " + this + " but " + start_state[x_start][y_start] + " was the piece found in the starting spot");
@@ -30,7 +32,7 @@ public class Move
         for(int i = 0; i < 8; i++)
             for(int j = 0; j<8; j++)
                 toReturn[i][j] = start_state[i][j];
-        
+
         toReturn[x_start][y_start] = new ChessPiece();
         toReturn[x_end][y_end] = this.chessPiece;
         return toReturn;

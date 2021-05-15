@@ -17,12 +17,19 @@ public class Tests {
         expectedResults.put("queen_1.txt", 27);
         expectedResults.put("queen_2.txt", 21);
         expectedResults.put("rook_3.txt", 14);
+        expectedResults.put("castling_1.txt", 26);
+        expectedResults.put("castling_2.txt", 25);
+        expectedResults.put("castling_3.txt", 4);
+
 
 
 
         File directoryPath = new File("testcases");
         //List of all files and directories
-        String[] contents = directoryPath.list();
+        String[] contents;
+        if(args.length==0)
+             contents = directoryPath.list();
+        else contents = args;
         int failures = 0;
         for (String a : contents) {
             System.out.println("\nRunning test " + a);
@@ -51,6 +58,7 @@ public class Tests {
         int count = 0;
         for (Move m : puzzle.getLegalMoves()) {
             System.out.println(m);
+
             count++;
         }
         System.out.println("there are " + count + " legal moves");
