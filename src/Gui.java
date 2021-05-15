@@ -147,7 +147,7 @@ class Gui extends JFrame {
         }
     }
 
-    public Gui(ChessPiece[][] chessPieces) {
+    public Gui(ChessPiece[][] chessPieces, String turn) {
         // initialize mapping from piece to unicode
         pieceMapping.put("KING", 0);
         pieceMapping.put("QUEEN", 1);
@@ -164,7 +164,6 @@ class Gui extends JFrame {
 
         // 1. boardPanel
         JPanel boardPanel = new JPanel(new GridLayout(10, 9));
-        String turn = "WHITE";
         this.boardPanel = boardPanel;
         this.turn = turn;
 
