@@ -14,13 +14,16 @@ public class Main {
             contents = directoryPath.list();
         else contents = args;
 
+        long start = System.nanoTime();
         for(String s: contents){
             ChessPuzzle puzzle = ChessBoardParser.parse("puzzles/" + s);
             System.out.println(puzzle.solvePuzzleOneMove());
         }
+        long end = System.nanoTime();
 
+        long mstime = ((end - start) / 1_000_000);
 
-
+        System.out.println("Took "+mstime+" ms to solve this puzzle.")
 
 
 
