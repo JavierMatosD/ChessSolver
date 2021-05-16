@@ -1,22 +1,29 @@
 //TODO: better exception handling?
 
+import java.io.File;
 import java.io.IOException;
 
 public class Main {
 
     public static void main(String[] args) throws Exception{
-        ChessPuzzle puzzle = null;
+
+        File directoryPath = new File("puzzles");
+        //List of all files and directories
+        String[] contents;
         if(args.length==0)
-            puzzle = ChessBoardParser.parse("../puzzles/puzzle3.txt");
-        else try {
-            puzzle = ChessBoardParser.parse(args[0]);
-        }catch (IOException e){
-            System.err.println("Please pass a valid text file as a command line argument.");
-            System.exit(1);
+            contents = directoryPath.list();
+        else contents = args;
+
+        for(String s: contents){
+            ChessPuzzle puzzle = ChessBoardParser.parse("puzzles/" + s);
+            System.out.println(puzzle.solvePuzzleOneMove());
         }
-        System.out.println(puzzle.solvePuzzle());
+
+
+
 
 
 
     }
+
 }

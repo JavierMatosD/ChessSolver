@@ -54,7 +54,7 @@ public class ChessPuzzle {
 
 
     //returns the first move found resulting in checkmate
-    public Move solvePuzzle() {
+    public Move solvePuzzleOneMove() {
         ArrayList<Move> legalMoves = this.getLegalMoves();
         Iterator itr = legalMoves.iterator();
         while (itr.hasNext()) {
@@ -64,12 +64,68 @@ public class ChessPuzzle {
         ChessPuzzle p;
         for (Move m : legalMoves) {
             p = new ChessPuzzle(!this.whiteTurn, m.executeMove(this.board)); //create a new puzzle that represents the state after the move is executed
-            if (p.getLegalMoves().size() == 0)
+            if (p.getLegalMoves().size() == 0) //if opponent has no moves, that's the game
                 return m;
         }
         return null;
     }
 
+
+    public ArrayList<Move> solvePuzzle() {
+        ArrayList<Move> legalMoves = this.getLegalMoves();
+        ArrayList<ArrayList<Move>> oppMoves = new ArrayList<ArrayList<Move>>();
+
+        for (int i = 0; i < legalMoves.size(); i++) {
+            oppMoves.add(new ChessPuzzle(!this.whiteTurn, legalMoves.get(i).executeMove(this.board)).getLegalMoves()); //legal moves for opponent if move executed
+            if (oppMoves.get(i).size() == 0 && checkCheck(legalMoves.get(i), !this.whiteTurn)) { //if this move leaves the opponent with no moves and opponent king in check, return this move
+                ArrayList<Move> toReturn = new ArrayList<Move>();
+                toReturn.add(legalMoves.get(i));
+                return toReturn;
+            }
+        }
+
+        //iterate over each move
+        for (int i = 0; i < legalMoves.size(); i++) {
+            boolean canEscape = false; //boolean for tracking if opponent has a move that won't lead to mate next turn
+
+            //iterate over each opponent's move. If all of them lead to checkmate, then this move must lead to checkmate
+            for (Move m : oppMoves.get(i)) {
+//                if(new ChessPuzzle(this.whiteTurn, m.executeMove(legalMoves.get(i).executeMove(this.board))).solvePuzzle());
+            }
+
+        }
+    }
+//idea: pass in the ChessPuzzles after moves executed?
+    public ArrayList<ArrayList<Move>> solvePuzzleRecursionHelper(ArrayList<ArrayList<Move>> legalMoves, ArrayList<ArrayList<Move>> oppMoves) {
+
+        ArrayList<ArrayList<Move>> nextOppMoves = new ArrayList<ArrayList<Move>>();
+        for (int i = 0; i < legalMoves.size(); i++) {
+            boolean canEscape = false; //boolean for tracking if opponent has a move that won't lead to mate next turn
+            ArrayList<ArrayList<Move>> winningMoves = new ArrayList<>(); //tracks the set of sets of moves that lead to victory.
+            //iterate over each opponent's move. If all of them lead to checkmate, then this move must lead to checkmate
+            ChessPuzzle
+
+            for (Move m : oppMoves.get(i)) {
+                Move mateInTwoMove = new ChessPuzzle(this.whiteTurn, m.executeMove(legalMoves.get(i).executeMove(this.board))).solvePuzzleOneMove();
+                if (mateInTwoMove == null) //if after executing your move and each of the opponent's moves,
+                    // there is not mate in 1, then this move doesn't lead to mate in this step
+                    canEscape = true;
+                else {
+                    ArrayList<Move> toAdd = new ArrayList<>(); //adds each victory sequence of moves to winningMoves.
+                    toAdd.add(legalMoves.get(i));
+                    toAdd.add(mateInTwoMove);
+                    winningMoves.add(toAdd);
+                }
+            }
+
+            if(!canEscape) {  //if all moves an opponent can make lead to mate next turn, return winningMoves. Else, start over and reinitialize winningMoves
+                return winningMoves;
+            }
+        }
+
+        //if we reach here, there's no mate in 2
+
+    }
 
     /**
      * Legal moves for each piece
@@ -97,10 +153,10 @@ public class ChessPuzzle {
     }
 
     /**
-     * Same as above, except this version ensure you can't make any moves that would put yourself in check. 
+     * Same as above, except this version ensure you can't make any moves that would put yourself in check.
      * The above version is for checking for check; that is, you can't make a move putting yourself in check, even if the move your opp
      * would make to take your king would put himself in check too
-    */
+     */
     public ArrayList<Move> getLegalMoves() {
 
         ArrayList<Move> moves = new ArrayList<Move>();
@@ -155,7 +211,7 @@ public class ChessPuzzle {
                     break;
             }
         } catch (Exception e) {
-            Gui board = new Gui(this.board);
+            Gui board = this.makeGui();
             System.out.println(e.getMessage());
             return null;
         }
@@ -165,7 +221,7 @@ public class ChessPuzzle {
 
     /**
      * Method is called by ChessPuzzle.getLocationLegalMoves(int x, int y) and returns the list
-     * of moves for the king at board[x][y]. NOTE: Knight can jump over pieces
+     * of moves for the king at board[x][y]. Castling is included
      *
      * @param row   starting index on board
      * @param col   starting index on board
@@ -651,6 +707,12 @@ public class ChessPuzzle {
         return false;
     }
 
+    public Gui makeGui() {
+        if (whiteTurn)
+            return new Gui(this.board, "WHITE");
+        else return new Gui(this.board, "BLACK");
+
+    }
 //TODO: a toString for debugging?
 
 }
