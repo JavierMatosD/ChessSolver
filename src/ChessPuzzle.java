@@ -109,8 +109,6 @@ public class ChessPuzzle {
             }
         }
         return legalMoves;
-
-
         }
 
 
@@ -673,7 +671,6 @@ public class ChessPuzzle {
 
             return moves;
         }
-
         /**
          * Method is called by ChessPuzzle.getLocationLegalMoves(int x, int y) and returns the list
          * of available moves for the rook at board[x][y]
@@ -729,8 +726,6 @@ public class ChessPuzzle {
             }
             return moves;
         }
-
-
         /**
          * Checks if the move leads to check. This method is called by ChessPuzzle.getLegalMoves().
          * Additionally this method depends on methods ChessPuzzle.getLegalMovesIgnoreCheck() and

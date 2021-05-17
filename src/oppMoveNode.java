@@ -92,7 +92,7 @@ public class oppMoveNode {
             ArrayList<Move> oppMoves = p.getLegalMoves(); //all of the opponent's legal moves
             if (p.checkCheckNoMove(p.whiteTurn) && oppMoves.size() == 0) { //if opponent is in check and has no legal moves
                 this.checkMate = true;
-                System.out.println("Checkmate" + this.value);
+                //System.out.println("Checkmate" + this.value);
                 parent.setCheckMate(); //set parent to checkmate, since you know if parent move is made, child move can mate them
                 return;
             }
