@@ -1,4 +1,6 @@
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.font.*;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
@@ -34,6 +36,10 @@ class Gui extends JFrame {
 
     // labels
     String[] COLS = "ABCDEFGH".split("");
+
+    // arraylist of moves
+    ArrayList<Move> moves = new ArrayList<>();
+    int currentMove = 0;
 
     private ArrayList<Shape> separateShapeIntoRegions(Shape shape) {
         ArrayList<Shape> regions = new ArrayList<Shape>();
@@ -233,10 +239,20 @@ class Gui extends JFrame {
                     }
                 }
 
-                // some padding
+                // some padding and button
                 boardPanel.add(new JLabel(" ", SwingConstants.CENTER));
                 boardPanel.add(new JLabel(" ", SwingConstants.CENTER));
-                boardPanel.add(new JLabel(" ", SwingConstants.CENTER));
+                // button
+                JButton next = new JButton("NEXT");
+                next.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        // execute the next move on the board
+                        executeNextMove();
+                    }
+                });
+                next.setMargin(new Insets(0, -4, 0, -4));
+                boardPanel.add(next);
                 boardPanel.add(new JLabel(" ", SwingConstants.CENTER));
 
                 JLabel turnLabel = new JLabel("TURN: ", SwingConstants.CENTER);
@@ -257,6 +273,20 @@ class Gui extends JFrame {
         };
 
         SwingUtilities.invokeLater(r);
+    }
+
+    public void executeNextMove() {
+        if (currentMove > moves.size() - 1) {
+            System.out.println("No more moves available");
+            return;
+        }
+
+        Move move = this.moves.get(currentMove);
+        int[] from = new int[] { move.x_start, move.y_start };
+        int[] to = new int[] { move.x_end, move.y_end };
+        move(from, to);
+
+        currentMove += 1;
     }
 
     // move a piece
