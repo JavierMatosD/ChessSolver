@@ -47,22 +47,26 @@ public class oppMoveNode {
     }
 
     public ArrayList<ArrayList<Move>> getSolutions() {
-        ArrayList<ArrayList<Move>> solutions = null;
+        ArrayList<ArrayList<Move>> solutions = new ArrayList<>();
         for (myMoveNode child : children) {
             if (child.checkMate) {
-                solutions = child.getSolutions(); //get solutions from child
+                solutions.addAll(child.getSolutions()); //get solutions from child
                 for (ArrayList<Move> solution : solutions) //prepend this node's move to each solution
-                    solution.add(0, this.value);
+                    if (this.value != null)
+                        solution.add(0, this.value);
+                break; //break out of loop, since checkmating move found. To find all checkmate moves, comment this out
             }
         }
         return solutions;
     }
-    public String toString(){
-        if(this.value==null)
+
+    public String toString() {
+        if (this.value == null)
             return "null";
         return this.value.toString();
 
     }
+
     static class myMoveNode {
         oppMoveNode parent;
         ArrayList<oppMoveNode> children;
@@ -77,22 +81,24 @@ public class oppMoveNode {
             this.children = new ArrayList<>();
         }
 
-        public String toString(){
+        public String toString() {
             return this.value.toString();
 
         }
+
         //state after the value move and all parents are executed
         public ChessPiece[][] getBoardState() {
             return this.value.executeMove(this.parent.getBoardState());
         }
 
+
+        //sets the children, or sets checkMate to true and parent checkmate to true
         public void setChildren() {
             ChessPiece[][] boardState = this.getBoardState();
             ChessPuzzle p = new ChessPuzzle(!this.puzzle.whiteTurn, boardState); //the state of the board after your move
             ArrayList<Move> oppMoves = p.getLegalMoves(); //all of the opponent's legal moves
-            if (p.checkCheckNoMove(p.whiteTurn) && oppMoves.size() == 0) { //if opponent is in check and has no legal moves
+            if (oppMoves.size() == 0 && p.checkCheckNoMove(p.whiteTurn)) { //if opponent is in check and has no legal moves
                 this.checkMate = true;
-                //System.out.println("Checkmate" + this.value);
                 parent.setCheckMate(); //set parent to checkmate, since you know if parent move is made, child move can mate them
                 return;
             }
@@ -111,7 +117,7 @@ public class oppMoveNode {
             return true;
         }
 
-        //check if this node is checkmate. Triggered by children
+        //check if this node is checkmate by checking if all children are checkmate. Triggered by children.
         public void triggeredCheckCheckMate() {
             if (checkChildren())
                 this.checkMate = true;
@@ -119,18 +125,19 @@ public class oppMoveNode {
         }
 
         public ArrayList<ArrayList<Move>> getSolutions() {
-            ArrayList<ArrayList<Move>> solutions = null; //for debugging, can be removed
-            if(this.children.size()==0) { //if this node has no children, it's a mate in 1 move
+            ArrayList<ArrayList<Move>> solutions = new ArrayList<>(); //for debugging, can be removed
+            if (this.children.size() == 0) { //if this node has no children, it's a mate in 1 move
                 ArrayList<Move> toAdd = new ArrayList<>();
                 toAdd.add(this.value);
                 solutions = new ArrayList<>();
                 solutions.add(toAdd);
+                return solutions;
             }
             for (oppMoveNode child : children) {
-                solutions = child.getSolutions(); //get solutions from child
-                for (ArrayList<Move> solution : solutions) //prepend this node's move to each solution
-                    solution.add(0, this.value);
+                solutions.addAll(child.getSolutions()); //get solutions from child
             }
+            for (ArrayList<Move> solution : solutions) //prepend this node's move to each solution
+                solution.add(0, this.value);
             return solutions;
         }
 
