@@ -11,7 +11,7 @@ public class ChessPuzzle {
 
     public boolean whiteTurn;
     public ChessPiece[][] board;
-
+    
     int blackKingXPos;
     int blackKingYPos;
     int whiteKingXPos;
@@ -50,6 +50,7 @@ public class ChessPuzzle {
             blackKingXPos = -1;
             blackKingYPos = -1;
         }
+
 
     }
 
@@ -218,6 +219,10 @@ public class ChessPuzzle {
                 }
 
             Iterator itr = moves.iterator();
+
+            // Initialize threads
+            boolean[] sharedMoves = new boolean[moves.size()];
+            
             while (itr.hasNext()) {
                 if (checkCheck((Move) itr.next(), this.whiteTurn)) //if a move leads to check for the player whose turn it is, remove it
                     itr.remove();

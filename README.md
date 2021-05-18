@@ -1,17 +1,17 @@
 # Chess Puzzle ChessPuzzle
+
 This program will ultimately solve chess puzzles and display the solution in a graphical representation.
 
 Right now, we have many of the component parts completed. First, we have the GUI implemented. This can be seen by running testBoard.java.
 There's still some bugs and implementation details to iron out, but this shows roughly what the end result will look like.
-The GUI can also be called by running ChessBoardParser with a command line argument that's the filepath 
+The GUI can also be called by running ChessBoardParser with a command line argument that's the filepath
 to a text file that can be parsed into a puzzle, as described below.
 
 We also have our data processing set up, in ChessBoardParser.java. This program can read in a text file (such as those found in testcases/),
-and parse it into a ChessPuzzle object. In the ChessPuzzle object we have implemented functionality that will, given whose turn it is 
-and a board state, find all the legal moves a player can take. Currently implemented are the rules for rook moves and functionality
-to invalidate any moves that would (illegally) put your own king into check. This is all done with a pretty brute force method.
-The file Tests.java runs all the unit tests created for the rules we've completed that are stored in testcases/, prints all the moves found, and validates that the number of 
-moves matches what's expected. 
+and parse it into a ChessPuzzle object. In the ChessPuzzle object we have implemented functionality that will, given whose turn it is
+and a board state, find all the legal moves a player can take. This is all done with a pretty brute force method.
+The file Tests.java runs all the unit tests created for the rules we've completed that are stored in testcases/, prints all the moves found, and validates that the number of
+moves matches what's expected.
 
 When we include the actual puzzles, we'll instead be validating by checking for the single solution that leads to checkmate.
 
