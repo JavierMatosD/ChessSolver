@@ -219,7 +219,7 @@ public class ChessPuzzle {
             {
                 b = false;
             }
-            
+
             // create a thread pool
             int nThreads = Runtime.getRuntime().availableProcessors();
             ExecutorService pool = Executors.newFixedThreadPool(nThreads);
@@ -667,9 +667,10 @@ public class ChessPuzzle {
 
             ArrayList<Move> moves = new ArrayList<>();
             ChessPiece pawn = new ChessPiece(type.PAWN, this.whiteTurn);
+           
             boolean whitePawn = board[row][col].isWhite();
-            boolean firstMove = ((row == 6 && whitePawn) || (row == 1) &&!whitePawn) ? true : false;
-
+            boolean firstMove = (row == 6 && whitePawn || row == 1 && !whitePawn) ? true : false;
+            
             if (whitePawn)
             {
                 // check one forward movement
