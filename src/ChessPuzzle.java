@@ -3,6 +3,8 @@
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  *
@@ -209,7 +211,7 @@ public class ChessPuzzle {
          * The above version is for checking for check; that is, you can't make a move putting yourself in check, even if the move your opp
          * would make to take your king would put himself in check too
          */
-        public ArrayList<Move> getLegalMoves () {
+        public ArrayList<Move> getLegalMoves() {
 
             ArrayList<Move> moves = new ArrayList<Move>();
 
@@ -219,13 +221,36 @@ public class ChessPuzzle {
                 }
 
             Iterator itr = moves.iterator();
-
-            // Initialize threads
-            boolean[] sharedMoves = new boolean[moves.size()];
             
-            while (itr.hasNext()) {
-                if (checkCheck((Move) itr.next(), this.whiteTurn)) //if a move leads to check for the player whose turn it is, remove it
-                    itr.remove();
+            // array will determine which moves to remove
+            boolean[] sharedMoves = new boolean[moves.size()];
+            for (boolean b : sharedMoves) 
+            {
+                b = false;
+            }
+            
+            // create a thread pool
+            int nThreads = Runtime.getRuntime().availableProcessors();
+            ExecutorService pool = Executors.newFixedThreadPool(nThreads);
+
+            // while (itr.hasNext()) {
+            //     if (checkCheck((Move) itr.next(), this.whiteTurn)) //if a move leads to check for the player whose turn it is, remove it
+            //         itr.remove();
+            // }
+            for (int i = 0; i < sharedMoves.length && itr.hasNext(); i++) 
+            {
+                getLegalMovesTask task = new getLegalMovesTask(sharedMoves, this, i, (Move) itr.next());
+                pool.execute(task);
+            }
+
+            pool.shutdown();
+
+            for (int i = 0; i < sharedMoves.length; i++) 
+            {
+                if (sharedMoves[i])
+                {
+                    moves.remove(i);
+                }
             }
             return moves;
         }
