@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 // testing chessboard graphics
 
 public class testBoard {
@@ -27,52 +29,9 @@ public class testBoard {
         // who's turn was it ? "BLACK"/"WHITE"
         Gui gui = new Gui(chessPieces, "WHITE");
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e1) {
-            e1.printStackTrace();
-        }
-
-        // move piece
-        int[] from = new int[] { 0, 1 };
-        int[] to = new int[] { 2, 2 };
-
-        gui.move(from, to);
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e1) {
-            e1.printStackTrace();
-        }
-
-        // move again
-        from = new int[] { 6, 4 };
-        to = new int[] { 5, 4 };
-
-        gui.move(from, to);
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e1) {
-            e1.printStackTrace();
-        }
-
-        // move again
-        from = new int[] { 1, 0 };
-        to = new int[] { 2, 0 };
-
-        gui.move(from, to);
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e1) {
-            e1.printStackTrace();
-        }
-
-        // move again
-        from = new int[] { 7, 5 };
-        to = new int[] { 2, 0 };
-
-        gui.move(from, to);
+        // arraylist of moves
+        ArrayList<Move> moves = new ArrayList<>();
+        moves.add(new Move(chessPieces[0][1], 0, 0, 4, 0));
+        gui.moves = moves;
     }
 }

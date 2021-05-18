@@ -646,29 +646,54 @@ public class ChessPuzzle {
 
             ArrayList<Move> moves = new ArrayList<>();
             ChessPiece pawn = new ChessPiece(type.PAWN, this.whiteTurn);
-            boolean firstMove = (row == 6) ? true : false;
+            boolean firstMove = (row == 6 || row == 1) ? true : false;
+            boolean whitePawn = board[row][col].isWhite();
+            
+            if (whitePawn)
+            {
+                // check one forward movement
+                if (row - 1 >= 0 && board[row - 1][col].getMyType() == type.EMPTY)
+                    moves.add(new Move(pawn, row, col, row - 1, col));
 
+                // check two forward
+                if (firstMove)
+                    if (board[row - 2][col].getMyType() == type.EMPTY)
+                        moves.add(new Move(pawn, row, col, row - 2, col));
 
-            // check one forward movement
-            if (row - 1 >= 0 && board[row - 1][col].getMyType() == type.EMPTY)
-                moves.add(new Move(pawn, row, col, row - 1, col));
+                //                  check captures
+                // right and up
+                if (row - 1 >= 0 && col + 1 < 8 && board[row - 1][col + 1].getMyType() != type.EMPTY)
+                    if (!board[row - 1][col + 1].isWhite())
+                        moves.add(new Move(pawn, row, col, row - 1, col + 1));
 
-            // check two forward
-            if (row - 2 >= 0 && firstMove)
-                if (board[row - 2][col].getMyType() == type.EMPTY)
-                    moves.add(new Move(pawn, row, col, row - 2, col));
+                // left and up
+                if (row - 1 >= 0 && col - 1 >= 0 && board[row - 1][col - 1].getMyType() != type.EMPTY)
+                    if (!board[row - 1][col - 1].isWhite())
+                        moves.add(new Move(pawn, row, col, row - 1, col - 1));
+                
+            } else
+            {
+                // check one forward movement
+                if (row + 1 < 8 && board[row + 1][col].getMyType() == type.EMPTY)
+                    moves.add(new Move(pawn, row, col, row + 1, col));
 
-            //                  check captures
-            // right and up
-            if (row - 1 >= 0 && col + 1 < 8 && board[row - 1][col + 1].getMyType() != type.EMPTY)
-                if (board[row - 1][col + 1].isWhite() != this.whiteTurn)
-                    moves.add(new Move(pawn, row, col, row - 1, col + 1));
+                // check two forward
+                if (firstMove)
+                    if (board[row + 2][col].getMyType() == type.EMPTY)
+                        moves.add(new Move(pawn, row, col, row + 2, col));
 
-            // left and up
-            if (row - 1 >= 0 && col - 1 >= 0 && board[row - 1][col - 1].getMyType() != type.EMPTY)
-                if (board[row - 1][col - 1].isWhite() != this.whiteTurn)
-                    moves.add(new Move(pawn, row, col, row - 1, col - 1));
+                //                  check captures
+                // right capture
+                if (row + 1 < 8 && col + 1 < 8 && board[row + 1][col + 1].getMyType() != type.EMPTY)
+                    if (board[row + 1][col + 1].isWhite())
+                        moves.add(new Move(pawn, row, col, row + 1, col + 1));
 
+                // left capture
+                if (row + 1 < 8 && col - 1 >= 0 && board[row + 1][col - 1].getMyType() != type.EMPTY)
+                    if (board[row + 1][col - 1].isWhite())
+                        moves.add(new Move(pawn, row, col, row + 1, col - 1));
+                
+            }
             return moves;
         }
         /**
