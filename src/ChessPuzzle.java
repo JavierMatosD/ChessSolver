@@ -2,6 +2,7 @@
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -205,6 +206,7 @@ public class ChessPuzzle {
         public ArrayList<Move> getLegalMoves() {
 
             ArrayList<Move> moves = new ArrayList<Move>();
+            ArrayList<Move> legalMoves = new ArrayList<Move>();
 
             for (int i = 0; i < 8; i++)
                 for (int j = 0; j < 8; j++) {
@@ -233,17 +235,18 @@ public class ChessPuzzle {
                 getLegalMovesTask task = new getLegalMovesTask(sharedMoves, this, i, (Move) itr.next());
                 pool.execute(task);
             }
-
-            pool.shutdown();
-
+           
             for (int i = 0; i < sharedMoves.length; i++) 
             {
-                if (sharedMoves[i])
+                if (!sharedMoves[i]) 
                 {
-                    moves.remove(i);
+                    legalMoves.add(moves.get(i));
                 }
             }
-            return moves;
+            
+            pool.shutdown();
+            
+            return legalMoves;
         }
 
         /**

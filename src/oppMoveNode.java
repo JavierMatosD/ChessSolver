@@ -22,6 +22,7 @@ public class oppMoveNode {
     }
 
     public void setChildren() {
+
         ChessPiece[][] boardState = this.getBoardState();
         ArrayList<Move> moves = new ChessPuzzle(this.puzzle.whiteTurn, boardState).getLegalMoves();
         for (Move m : moves) {

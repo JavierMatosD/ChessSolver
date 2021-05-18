@@ -7,7 +7,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        File directoryPath = new File("puzzles");
+        File directoryPath = new File("../puzzles");
         //List of all files and directories
         String[] contents;
         if (args.length == 0)
@@ -16,7 +16,7 @@ public class Main {
 
         long start = System.nanoTime();
         for(String s: contents){
-            ChessPuzzle puzzle = ChessBoardParser.parse("puzzles/" + s);
+            ChessPuzzle puzzle = ChessBoardParser.parse("../puzzles/" + s);
 //            System.out.println(s +" 2 hard coded: " + puzzle.nodeSolvePuzzle());
             System.out.println(s +" tree: " + puzzle.solvePuzzle());
 

@@ -108,6 +108,7 @@ public class ChessBoardParser {
 		}
 
 		catch (IOException ex) {
+			System.out.println(filePath);
 			System.out.format("I/O Exception", ex);
 		}
 

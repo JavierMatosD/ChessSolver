@@ -16,6 +16,7 @@ public class getLegalMovesTask implements Runnable {
 
     @Override
     public void run() {
+
         if (puzzle.checkCheck(move, puzzle.whiteTurn))
         {
             sharedMoves[id] = true;
