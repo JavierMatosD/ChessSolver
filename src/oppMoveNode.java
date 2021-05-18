@@ -119,10 +119,10 @@ public class oppMoveNode {
 
         //check if this node is checkmate by checking if all children are checkmate. Triggered by children.
         public void triggeredCheckCheckMate() {
-            if (checkChildren())
+            if (checkChildren()){
                 this.checkMate = true;
             parent.setCheckMate();
-        }
+        }}
 
         public ArrayList<ArrayList<Move>> getSolutions() {
             ArrayList<ArrayList<Move>> solutions = new ArrayList<>(); //for debugging, can be removed

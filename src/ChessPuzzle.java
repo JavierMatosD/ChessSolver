@@ -1,5 +1,6 @@
 //TODO: minor, but we're declaring new ChessPiece objects when we don't always need to
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -96,20 +97,10 @@ public class ChessPuzzle {
         return root.getSolutions();
     }
 
-    public ArrayList<Move> solvePuzzle() {
-        ArrayList<Move> legalMoves = this.getLegalMoves();
-        ArrayList<ArrayList<Move>> oppMoves = new ArrayList<ArrayList<Move>>();
-
-        for (int i = 0; i < legalMoves.size(); i++) {
-            oppMoves.add(new ChessPuzzle(!this.whiteTurn, legalMoves.get(i).executeMove(this.board)).getLegalMoves()); //legal moves for opponent if move executed
-            if (oppMoves.get(i).size() == 0 && checkCheck(legalMoves.get(i), !this.whiteTurn)) { //if this move leaves the opponent with no moves and opponent king in check, return this move
-                ArrayList<Move> toReturn = new ArrayList<Move>();
-                toReturn.add(legalMoves.get(i));
-                return toReturn;
-            }
-        }
-        return legalMoves;
-        }
+    public ArrayList<ArrayList<Move>> solvePuzzle() {
+        MoveTree mt = new MoveTree(this);
+        return mt.solveTree(4);
+    }
 
 
     //idea: pass in the ChessPuzzles after moves executed?
@@ -391,7 +382,7 @@ public class ChessPuzzle {
             //     |
             if (row - 1 >= 0 && col + 2 < 8 && (board[row - 1][col + 2].getMyType() == type.EMPTY || board[row - 1][col + 2].isWhite() != this.whiteTurn))
                 moves.add(new Move(knight, row, col, row - 1, col + 2));
-            if (row + 1 < 8 && col + 2 < 8 && (board[row + 1][col + 2].getMyType() == type.EMPTY || board[row - 1][col + 2].isWhite() != this.whiteTurn))
+            if (row + 1 < 8 && col + 2 < 8 && (board[row + 1][col + 2].getMyType() == type.EMPTY || board[row + 1][col + 2].isWhite() != this.whiteTurn))
                 moves.add(new Move(knight, row, col, row + 1, col + 2));
 
             // (two spaces up and one left or right
@@ -646,9 +637,9 @@ public class ChessPuzzle {
 
             ArrayList<Move> moves = new ArrayList<>();
             ChessPiece pawn = new ChessPiece(type.PAWN, this.whiteTurn);
-            boolean firstMove = (row == 6 || row == 1) ? true : false;
             boolean whitePawn = board[row][col].isWhite();
-            
+            boolean firstMove = ((row == 6 && whitePawn) || (row == 1) &&!whitePawn) ? true : false;
+
             if (whitePawn)
             {
                 // check one forward movement
