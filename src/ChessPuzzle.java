@@ -107,72 +107,6 @@ public class ChessPuzzle {
     }
 
 
-    //idea: pass in the ChessPuzzles after moves executed?
-    public ArrayList<ArrayList<Move>> solvePuzzleRecursionHelper(ArrayList<ArrayList<Move>> possibleMoveSets, ArrayList<ArrayList<Move>> oppMoves) {
-
-        ArrayList<ArrayList<Move>> nextOppMoves = new ArrayList<ArrayList<Move>>();
-        ArrayList<ArrayList<Move>> nextPossibleMoveSets = new ArrayList<ArrayList<Move>>();
-
-        ArrayList<ChessPuzzle> puzzles = new ArrayList<>();
-
-        for (int i = 0; i < possibleMoveSets.size(); i++) {
-            boolean canEscape = false; //boolean for tracking if opponent has a move that won't lead to mate next turn
-            ArrayList<ArrayList<Move>> winningMoves = new ArrayList<>(); //tracks the set of sets of moves that lead to victory.
-
-
-            ChessPiece[][] newBoard = this.board;
-            for (Move m : possibleMoveSets.get(i)) //executes every move in this set of moves, creating the updated board state
-                newBoard = m.executeMove(newBoard);
-
-//            puzzles.add(new ChessPuzzle(this.whiteTurn, newBoard)); //add the board to array puzzles
-
-            for (Move m : oppMoves.get(i)) {
-
-                Move mateInTwoMove = new ChessPuzzle(this.whiteTurn, m.executeMove(newBoard)).solvePuzzleOneMove(); //execute the opponent's move and check for mate in one
-                if (mateInTwoMove == null) //if after executing your move and each of the opponent's moves,
-                    // there is not mate in 1, then this move doesn't lead to mate in this step
-                    canEscape = true;
-                else {
-                    ArrayList<Move> toAdd = new ArrayList<>(); // get the full sequence of moves and add it to winningMoves
-                    for (Move n : possibleMoveSets.get(i))
-                        toAdd.add(n);
-                    toAdd.add(m);
-                    toAdd.add(mateInTwoMove);
-                    winningMoves.add(toAdd);
-                }
-            }
-
-            if (!canEscape) {  //if all moves an opponent can make lead to mate next turn, return winningMoves. Else, start over and reinitialize winningMoves
-                return winningMoves;
-            }
-
-
-        }
-
-        //if we reach here, there's no mate in 2. Time to calculate the next possible move sets and opponent moves
-        //this is kinda redundant with the previous for loop. But given the exponential nature of the problem, doing it afterwards
-        //likely saves time, since there's less work done before the terminating condition
-        for (int i = 0; i < possibleMoveSets.size(); i++) {
-            for (Move m : oppMoves.get(i)) {
-                ChessPiece[][] boardstate = m.executeMove(executeMoves(possibleMoveSets.get(i), this.board)); //boardstate after executing previous moves and opponent's move
-                ArrayList<Move> possibleNextMoves = new ChessPuzzle(this.whiteTurn, boardstate).getLegalMoves();
-                for (Move n : possibleNextMoves) {
-                    ArrayList<Move> toAdd = new ArrayList<>();
-                    toAdd.addAll(possibleMoveSets.get(i));
-                    toAdd.add(m);
-                    toAdd.add(n);
-                    nextPossibleMoveSets.add(toAdd);
-                }
-            }
-
-        }
-        //populate nextOppMoves
-        for (int i = 0; i < nextPossibleMoveSets.size(); i++) {
-            nextOppMoves.add(new ChessPuzzle(!this.whiteTurn, executeMoves(nextPossibleMoveSets.get(i), this.board)).getLegalMoves());
-        }
-
-        return solvePuzzleRecursionHelper(possibleMoveSets, oppMoves);
-    }
 
     /**
      * Legal moves for each piece
@@ -860,6 +794,6 @@ public class ChessPuzzle {
         }
         return board;
     }
-//TODO: a toString for debugging?
+
 
 }

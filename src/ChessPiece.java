@@ -3,7 +3,6 @@ import java.util.Objects;
 public class ChessPiece{
 
     type myType;
-
     boolean isWhite;
 
     public ChessPiece(type myType, boolean isWhite){
