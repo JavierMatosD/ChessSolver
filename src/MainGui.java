@@ -2,16 +2,21 @@ import java.io.File;
 import java.util.*;
 
 class MainGui {
-    public MainGui() {
-        File directoryPath = new File("../puzzles");
+    public static void main(String[] args) {
+        File directoryPath = new File("puzzles");
+        if (!directoryPath.exists())
+            directoryPath = new File("../puzzles");
         String[] contents;
         contents = directoryPath.list();
         // mate in one puzzle
-        String puzzlePath = contents[0];
+        String puzzlePath;
+        if(args.length ==0)
+        puzzlePath = contents[0];
+        else puzzlePath = args[0];
 
         long start = System.nanoTime();
         try{          
-            ChessPuzzle puzzle = ChessBoardParser.parse("../puzzles/" + puzzlePath);
+            ChessPuzzle puzzle = ChessBoardParser.parse(directoryPath + "/" + puzzlePath);
             String turn = puzzle.whiteTurn == true ? "WHITE" : "BLACK";
             Gui gui = new Gui(puzzle.board, turn);
             ArrayList<ArrayList<Move>> moves =  puzzle.solvePuzzle();
