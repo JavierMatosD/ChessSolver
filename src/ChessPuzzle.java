@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- *
+ *Constructor 
  */
 public class ChessPuzzle {
 
@@ -58,7 +58,6 @@ public class ChessPuzzle {
 
     }
 
-
     //returns the first move found resulting in checkmate
     public Move solvePuzzleOneMove() {
         ArrayList<Move> legalMoves = this.getLegalMoves();
@@ -105,8 +104,6 @@ public class ChessPuzzle {
         MoveTree mt = new MoveTree(this);
         return mt.solveTree(3);
     }
-
-
 
     /**
      * Legal moves for each piece
@@ -779,7 +776,6 @@ public class ChessPuzzle {
                 return true;
         return false;
     }
-
 
     public Gui makeGui() {
         if (whiteTurn)
