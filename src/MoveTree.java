@@ -23,8 +23,18 @@ public class MoveTree {
             }
             oppCurrentMoves.clear();
             for (myMoveNode n : myCurrentMoves) { //set children of all myCurrentMoves. Put them in oppCurrentMoves
-                n.setChildren();
-                oppCurrentMoves.addAll(n.children);
+                if (ChessPuzzle.staticCheckCheck(!this.puzzle.whiteTurn, n.getBoardState())) { //do the ones that lead to check first
+                    n.check = true;
+                    n.setChildren();
+                    oppCurrentMoves.addAll(n.children);
+                }
+            }
+            for (myMoveNode n : myCurrentMoves) {
+                if (!n.check) {
+                    n.setChildren();
+                    oppCurrentMoves.addAll(n.children);
+
+                }
             }
             myCurrentMoves.clear();
             if (root.checkMate)
@@ -111,12 +121,14 @@ public class MoveTree {
         Move value;
         boolean checkMate; //set to true if true for all children
         ChessPuzzle puzzle;
+        boolean check;
 
         public myMoveNode(Move value, oppMoveNode parent, ChessPuzzle puzzle) {
             this.value = value;
             this.parent = parent;
             this.puzzle = puzzle;
             this.children = new ArrayList<>();
+            this.check = false;
         }
 
         public String toString() {
