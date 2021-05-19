@@ -242,8 +242,21 @@ class Gui extends JFrame {
                 // some padding and button
                 boardPanel.add(new JLabel(" ", SwingConstants.CENTER));
                 boardPanel.add(new JLabel(" ", SwingConstants.CENTER));
+                // next puzzle button
                 // button
-                JButton next = new JButton("NEXT");
+                // JButton nextPuzzle = new JButton("NEXT PUZZLE");
+                // nextPuzzle.addActionListener(new ActionListener() {
+                // @Override
+                // public void actionPerformed(ActionEvent e) {
+                // // execute the next move on the board
+                // executeNextPuzzle();
+                // }
+                // });
+                // nextPuzzle.setMargin(new Insets(0, -4, 0, -4));
+                // boardPanel.add(nextPuzzle);
+
+                // next turn button
+                JButton next = new JButton("NEXT TURN");
                 next.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -277,6 +290,9 @@ class Gui extends JFrame {
 
     public void executeNextMove() {
         if (currentMove > moves.size() - 1) {
+            int[] from = new int[] { 0,0 };
+            int[] to = new int[] { 0,0 };
+            move(from, to, true);
             System.out.println("No more moves available");
             return;
         }
@@ -284,13 +300,21 @@ class Gui extends JFrame {
         Move move = this.moves.get(currentMove);
         int[] from = new int[] { move.x_start, move.y_start };
         int[] to = new int[] { move.x_end, move.y_end };
-        move(from, to);
+        move(from, to, false);
 
         currentMove += 1;
     }
 
+    public void executeNextPuzzle() {
+
+    }
+
     // move a piece
-    public void move(int[] from, int[] to) {
+    public void move(int[] from, int[] to, boolean checkmate) {
+        if (checkmate) {
+            this.movesModel.addElement("CHECKMATE");
+            return;
+        }
         // converting them to jpanel coordinates
         // to find its position in the JPanel "Array"
         int f = 9 * from[0] + from[1];
