@@ -8,6 +8,8 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
         File directoryPath = new File("puzzles");
+        if (!directoryPath.exists())
+            directoryPath = new File("../puzzles");
         //List of all files and directories
         String[] contents;
         if (args.length == 0)
@@ -17,7 +19,7 @@ public class Main {
         for(String s: contents){
             long start = System.nanoTime();
 
-            ChessPuzzle puzzle = ChessBoardParser.parse("puzzles/" + s);
+            ChessPuzzle puzzle = ChessBoardParser.parse(directoryPath.getName() +"/"+ s);
 //            System.out.println(s +" 2 hard coded: " + puzzle.nodeSolvePuzzle());
             System.out.println(s +" tree: " + puzzle.solvePuzzle());
             long end = System.nanoTime();

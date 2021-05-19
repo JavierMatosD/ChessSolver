@@ -25,8 +25,9 @@ public class Tests {
 
 
 
-        File directoryPath = new File("../testcases");
-        //List of all files and directories
+        File directoryPath = new File("testcases");
+        if (!directoryPath.exists())
+            directoryPath = new File("../testcases");        //List of all files and directories
         String[] contents;
         if(args.length==0)
              contents = directoryPath.list();
@@ -35,7 +36,7 @@ public class Tests {
         for (String a : contents) {
             System.out.println("\nRunning test " + a);
             try {
-                if (runTest(ChessBoardParser.parse("../testcases/" + a)) != expectedResults.get(a)) {
+                if (runTest(ChessBoardParser.parse(directoryPath + "/" + a)) != expectedResults.get(a)) {
                     failures++;
                     System.out.println("Test case failed!"); //This is printing to stdout instead of stderr because intellij messes up the timing of the two output streams for some reason
                 }
