@@ -207,7 +207,6 @@ public class ChessPuzzle {
     public ArrayList<Move> getLegalMoves() {
 
         ArrayList<Move> moves = new ArrayList<Move>();
-//            ArrayList<Move> legalMoves = new ArrayList<Move>();
 
         for (int i = 0; i < 8; i++)
             for (int j = 0; j < 8; j++) {
@@ -215,40 +214,59 @@ public class ChessPuzzle {
             }
 
         Iterator itr = moves.iterator();
-//
-//            // array will determine which moves to remove
-//            boolean[] sharedMoves = new boolean[moves.size()];
-//            for (boolean b : sharedMoves)
-//            {
-//                b = false;
-//            }
-//
-//            // create a thread pool
-//            int nThreads = Runtime.getRuntime().availableProcessors();
-//            ExecutorService pool = Executors.newFixedThreadPool(nThreads);
 
         while (itr.hasNext()) {
             if (checkCheck((Move) itr.next(), this.whiteTurn)) //if a move leads to check for the player whose turn it is, remove it
                 itr.remove();
         }
-//            for (int i = 0; i < sharedMoves.length && itr.hasNext(); i++)
-//            {
-//                getLegalMovesTask task = new getLegalMovesTask(sharedMoves, this, i, (Move) itr.next());
-//                pool.execute(task);
-//            }
-//
-//            for (int i = 0; i < sharedMoves.length; i++)
-//            {
-//                if (!sharedMoves[i])
-//                {
-//                    legalMoves.add(moves.get(i));
-//                }
-//            }
-//
-//            pool.shutdown();
+
         return moves;
 
-//            return legalMoves;
+    }
+
+    /**
+     * Same as getLegalMoves but parallelized
+     */
+    public ArrayList<Move> getLegalMovesParallel() {
+        
+        ArrayList<Move> moves = new ArrayList<Move>();
+        ArrayList<Move> legalMoves = new ArrayList<Move>();
+
+        for (int i = 0; i < 8; i++)
+            for (int j = 0; j < 8; j++) {
+                moves.addAll(getLocationLegalMoves(i, j, this.whiteTurn));
+            }
+
+        Iterator itr = moves.iterator();
+        
+        // array will determine which moves to remove
+        boolean[] sharedMoves = new boolean[moves.size()];
+        for (boolean b : sharedMoves)
+        {
+        b = false;
+        }
+        
+        // create a thread pool
+        int nThreads = Runtime.getRuntime().availableProcessors();
+        ExecutorService pool = Executors.newFixedThreadPool(nThreads);
+
+
+        for (int i = 0; i < sharedMoves.length && itr.hasNext(); i++)
+        {
+            getLegalMovesTask task = new getLegalMovesTask(sharedMoves, this, i, (Move) itr.next());
+            pool.execute(task);
+        }
+
+        for (int i = 0; i < sharedMoves.length; i++)
+        {
+            if (!sharedMoves[i])
+            {
+                legalMoves.add(moves.get(i));
+            }
+        }
+
+        pool.shutdown();
+        return legalMoves;
     }
 
     /**
