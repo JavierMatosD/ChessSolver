@@ -1,6 +1,7 @@
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
-public class getLegalMovesTask implements Runnable {
+public class getLegalMovesTask implements Runnable, Callable {
     
     AtomicReferenceArray<Boolean> sharedMoves;
     ChessPuzzle puzzle;
@@ -25,5 +26,9 @@ public class getLegalMovesTask implements Runnable {
             sharedMoves.getAndSet(id, true);
         }
     }
-    
+
+    @Override
+    public Object call() throws Exception {
+        return null;
+    }
 }

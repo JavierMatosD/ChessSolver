@@ -27,12 +27,22 @@ public class Main {
 
             ChessPuzzle puzzle = ChessBoardParser.parse(directoryPath.getName() + "/" + s);
 
-            System.out.println(s + " tree: " + puzzle.solvePuzzle(true, pool));
-            pool.shutdown();    
+            System.out.println(s + " tree: " + puzzle.solvePuzzle());
             long end = System.nanoTime();
 
 
             long mstime = ((end - start) / 1_000_000);
+            System.out.println("Took " + mstime + " ms to solve this puzzle.");
+            start = System.nanoTime();
+
+            puzzle.addPool(pool);
+            System.out.println(s + " tree: " + puzzle.solvePuzzle());
+
+            pool.shutdown();    
+             end = System.nanoTime();
+
+
+            mstime = ((end - start) / 1_000_000);
             System.out.println("Took " + mstime + " ms to solve this puzzle.");
             //            System.out.println(s + " one only: " +puzzle.solvePuzzleOneMove());
 
