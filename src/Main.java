@@ -20,8 +20,9 @@ public class Main {
             long start = System.nanoTime();
 
             ChessPuzzle puzzle = ChessBoardParser.parse(directoryPath.getName() +"/"+ s);
-//            System.out.println(s +" 2 hard coded: " + puzzle.nodeSolvePuzzle());
-            System.out.println(s +" tree: " + puzzle.solvePuzzle());
+
+            System.out.println(s + " tree: " + puzzle.solvePuzzle(true));
+
             long end = System.nanoTime();
 
             long mstime = ((end - start) / 1_000_000);

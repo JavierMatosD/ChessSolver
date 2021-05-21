@@ -1,11 +1,13 @@
+import java.util.concurrent.atomic.AtomicReferenceArray;
+
 public class getLegalMovesTask implements Runnable {
     
-    boolean[] sharedMoves;
+    AtomicReferenceArray<Boolean> sharedMoves;
     ChessPuzzle puzzle;
     int id;
     Move move;
     
-    public getLegalMovesTask(boolean[] sharedMoves, ChessPuzzle puzzle, int id, Move move) 
+    public getLegalMovesTask(AtomicReferenceArray<Boolean> sharedMoves, ChessPuzzle puzzle, int id, Move move) 
     {
         this.sharedMoves = sharedMoves;
         this.puzzle      = puzzle;
@@ -17,9 +19,9 @@ public class getLegalMovesTask implements Runnable {
     @Override
     public void run() {
 
-        if (puzzle.checkCheck(move, puzzle.whiteTurn))
+        if (puzzle.checkCheck(move, puzzle.whiteTurn, puzzle.board))
         {
-            sharedMoves[id] = true;
+            sharedMoves.getAndSet(id, true);
         }
     }
     

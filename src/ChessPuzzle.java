@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
  *Constructor 
@@ -63,7 +65,7 @@ public class ChessPuzzle {
         ArrayList<Move> legalMoves = this.getLegalMoves();
         Iterator itr = legalMoves.iterator();
         while (itr.hasNext()) {
-            if (!checkCheck((Move) itr.next(), !this.whiteTurn)) //if a move does not lead to check on the opposing king, remove it
+            if (!checkCheck((Move) itr.next(), !this.whiteTurn, this.board)) //if a move does not lead to check on the opposing king, remove it
                 itr.remove();
         }
         ChessPuzzle p;
@@ -100,9 +102,9 @@ public class ChessPuzzle {
         return root.getSolutions();
     }
 
-    public ArrayList<ArrayList<Move>> solvePuzzle() {
+    public ArrayList<ArrayList<Move>> solvePuzzle(boolean parallel) {
         MoveTree mt = new MoveTree(this);
-        return mt.solveTree(3);
+        return mt.solveTree(3, parallel);
     }
 
     /**
@@ -147,7 +149,7 @@ public class ChessPuzzle {
         Iterator itr = moves.iterator();
 
         while (itr.hasNext()) {
-            if (checkCheck((Move) itr.next(), this.whiteTurn)) //if a move leads to check for the player whose turn it is, remove it
+            if (checkCheck((Move) itr.next(), this.whiteTurn, this.board)) //if a move leads to check for the player whose turn it is, remove it
                 itr.remove();
         }
 
@@ -171,26 +173,29 @@ public class ChessPuzzle {
         Iterator itr = moves.iterator();
         
         // array will determine which moves to remove
-        boolean[] sharedMoves = new boolean[moves.size()];
-        for (boolean b : sharedMoves)
-        {
-        b = false;
+        //boolean[] sharedMoves = new boolean[moves.size()];
+        AtomicReferenceArray<Boolean> sharedMoves = new AtomicReferenceArray<>(moves.size());
+        for (int i = 0; i < sharedMoves.length(); i++) {
+            sharedMoves.getAndSet(i, false);
         }
         
         // create a thread pool
         int nThreads = Runtime.getRuntime().availableProcessors();
         ExecutorService pool = Executors.newFixedThreadPool(nThreads);
 
-
-        for (int i = 0; i < sharedMoves.length && itr.hasNext(); i++)
+       
+        for (int i = 0; i < sharedMoves.length() && itr.hasNext(); i++)
         {
-            getLegalMovesTask task = new getLegalMovesTask(sharedMoves, this, i, (Move) itr.next());
+            ChessPuzzle board = new ChessPuzzle(this.whiteTurn, this.board);
+            Move tmpMove = (Move) itr.next();
+            Move move = new Move(tmpMove.chessPiece, tmpMove.x_start, tmpMove.y_start, tmpMove.x_end, tmpMove.y_end);
+            getLegalMovesTask task = new getLegalMovesTask(sharedMoves, board, i, move);
             pool.execute(task);
         }
 
-        for (int i = 0; i < sharedMoves.length; i++)
+        for (int i = 0; i < sharedMoves.length(); i++)
         {
-            if (!sharedMoves[i])
+            if (!sharedMoves.get(i))
             {
                 legalMoves.add(moves.get(i));
             }
@@ -214,7 +219,7 @@ public class ChessPuzzle {
         try {
             switch (board[x_start][y_start].getMyType()) {
                 case ROOK: //assuming the player is black
-                    moves.addAll(getRookMoves(x_start, y_start));
+                    moves.addAll(getRookMoves(x_start, y_start, board));
                     break;
                 case BISHOP:
                     moves.addAll(getBishopMoves(x_start, y_start, board));
@@ -678,7 +683,7 @@ public class ChessPuzzle {
      * @param y_start
      * @return
      */
-    public ArrayList<Move> getRookMoves(int x_start, int y_start) {
+    public ArrayList<Move> getRookMoves(int x_start, int y_start, ChessPiece[][] board) {
 
         ChessPiece rook = new ChessPiece(type.ROOK, this.whiteTurn);
         ArrayList<Move> moves = new ArrayList<>();
@@ -736,8 +741,8 @@ public class ChessPuzzle {
      * @param checkWhite if true, then we're looking to see if white king in check. If false, black king
      * @return boolean, true if the king is in check
      */
-    public boolean checkCheck(Move move, boolean checkWhite) {
-        ChessPuzzle p = new ChessPuzzle(!checkWhite, move.executeMove(this.board)); //create a new puzzle that represents the state after the move is executed
+    public boolean checkCheck(Move move, boolean checkWhite, ChessPiece[][] board) {
+        ChessPuzzle p = new ChessPuzzle(!checkWhite, move.executeMove(board)); //create a new puzzle that represents the state after the move is executed
         ArrayList<Move> oppMoves = p.getLegalMovesIgnoreCheck(); //get all the moves the opponent can make
         //iterate over those moves, see if any of them lead to capturing the king. If so, this move leads to check
         if (checkWhite)
