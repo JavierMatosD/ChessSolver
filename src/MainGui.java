@@ -19,7 +19,7 @@ class MainGui {
             ChessPuzzle puzzle = ChessBoardParser.parse(directoryPath + "/" + puzzlePath);
             String turn = puzzle.whiteTurn == true ? "WHITE" : "BLACK";
             Gui gui = new Gui(puzzle.board, turn);
-            ArrayList<ArrayList<Move>> moves =  puzzle.solvePuzzle();
+            ArrayList<ArrayList<Move>> moves =  puzzle.solvePuzzle(false);
             ArrayList<Move> move = moves.get(0);
             gui.moves = move;
         } catch(Exception e){

@@ -21,6 +21,8 @@ public class Tests {
         expectedResults.put("castling_1.txt", 26);
         expectedResults.put("castling_2.txt", 25);
         expectedResults.put("castling_3.txt", 4);
+        expectedResults.put("promotion_1.txt", 2);
+        expectedResults.put("promotion_2.txt", 2);
 
 
 

@@ -1,17 +1,15 @@
 //TODO: minor, but we're declaring new ChessPiece objects when we don't always need to
+//TODO instead of empty chesspieces, why not null?
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
- *Constructor 
+ * Constructor
  */
 public class ChessPuzzle {
 
@@ -146,12 +144,8 @@ public class ChessPuzzle {
                 moves.addAll(getLocationLegalMoves(i, j, this.whiteTurn));
             }
 
-        Iterator itr = moves.iterator();
-
-        while (itr.hasNext()) {
-            if (checkCheck((Move) itr.next(), this.whiteTurn, this.board)) //if a move leads to check for the player whose turn it is, remove it
-                itr.remove();
-        }
+        //if a move leads to check for the player whose turn it is, remove it
+        moves.removeIf(o -> checkCheck(o, this.whiteTurn, this.board));
 
         return moves;
 
@@ -161,7 +155,7 @@ public class ChessPuzzle {
      * Same as getLegalMoves but parallelized
      */
     public ArrayList<Move> getLegalMovesParallel() {
-        
+
         ArrayList<Move> moves = new ArrayList<Move>();
         ArrayList<Move> legalMoves = new ArrayList<Move>();
 
@@ -171,21 +165,20 @@ public class ChessPuzzle {
             }
 
         Iterator itr = moves.iterator();
-        
+
         // array will determine which moves to remove
         //boolean[] sharedMoves = new boolean[moves.size()];
         AtomicReferenceArray<Boolean> sharedMoves = new AtomicReferenceArray<>(moves.size());
         for (int i = 0; i < sharedMoves.length(); i++) {
             sharedMoves.getAndSet(i, false);
         }
-        
+
         // create a thread pool
         int nThreads = Runtime.getRuntime().availableProcessors();
         ExecutorService pool = Executors.newFixedThreadPool(nThreads);
 
-       
-        for (int i = 0; i < sharedMoves.length() && itr.hasNext(); i++)
-        {
+
+        for (int i = 0; i < sharedMoves.length() && itr.hasNext(); i++) {
             ChessPuzzle board = new ChessPuzzle(this.whiteTurn, this.board);
             Move tmpMove = (Move) itr.next();
             Move move = new Move(tmpMove.chessPiece, tmpMove.x_start, tmpMove.y_start, tmpMove.x_end, tmpMove.y_end);
@@ -193,10 +186,8 @@ public class ChessPuzzle {
             pool.execute(task);
         }
 
-        for (int i = 0; i < sharedMoves.length(); i++)
-        {
-            if (!sharedMoves.get(i))
-            {
+        for (int i = 0; i < sharedMoves.length(); i++) {
+            if (!sharedMoves.get(i)) {
                 legalMoves.add(moves.get(i));
             }
         }
@@ -672,6 +663,21 @@ public class ChessPuzzle {
                     moves.add(new Move(pawn, row, col, row + 1, col - 1));
 
         }
+
+        //check moves for promotions
+
+        ListIterator<Move> iter = moves.listIterator();
+        while (iter.hasNext()) {
+            Move toCheck = iter.next();
+            if ((this.whiteTurn && (toCheck).x_end == 0) || (!this.whiteTurn && (toCheck).x_end == 7)) {
+                iter.remove();
+
+                iter.add(new PromotionMove(toCheck.chessPiece, toCheck.x_start, toCheck.y_start, toCheck.x_end, toCheck.y_end, new ChessPiece(type.QUEEN, this.whiteTurn)));
+                iter.add(new PromotionMove(toCheck.chessPiece, toCheck.x_start, toCheck.y_start, toCheck.x_end, toCheck.y_end, new ChessPiece(type.KNIGHT, this.whiteTurn)));
+            }
+
+        }
+
         return moves;
     }
 
