@@ -18,11 +18,11 @@ public class Main {
         if (args.length == 0)
             contents = directoryPath.list();
         else contents = args;
-
+        int nThreads = Runtime.getRuntime().availableProcessors();
+        ExecutorService pool = Executors.newFixedThreadPool(nThreads);
         for (String s : contents) {
             long start = System.nanoTime();
-            int nThreads = Runtime.getRuntime().availableProcessors();
-            ExecutorService pool = Executors.newFixedThreadPool(nThreads);
+
 
 
             ChessPuzzle puzzle = ChessBoardParser.parse(directoryPath.getName() + "/" + s);
@@ -38,16 +38,16 @@ public class Main {
             puzzle.addPool(pool);
             System.out.println(s + " tree: " + puzzle.solvePuzzle());
 
-            pool.shutdown();    
              end = System.nanoTime();
 
 
             mstime = ((end - start) / 1_000_000);
-            System.out.println("Took " + mstime + " ms to solve this puzzle.");
+            System.out.println("Took " + mstime + " ms to solve this puzzle with parallelism.");
             //            System.out.println(s + " one only: " +puzzle.solvePuzzleOneMove());
 
         }
-        
+        pool.shutdown();
+
 
 
 
