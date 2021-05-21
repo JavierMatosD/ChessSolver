@@ -21,6 +21,7 @@ public class getLegalMovesTask implements Runnable {
 
         if (puzzle.checkCheck(move, puzzle.whiteTurn, puzzle.board))
         {
+            //System.out.println("ID: " + id + ", Checking: " + move.chessPiece);
             sharedMoves.getAndSet(id, true);
         }
     }
