@@ -1,8 +1,12 @@
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 class MainGui {
     public static void main(String[] args) {
+         int nThreads = Runtime.getRuntime().availableProcessors();
+        ExecutorService pool = Executors.newFixedThreadPool(nThreads);
         File directoryPath = new File("puzzles");
         if (!directoryPath.exists())
             directoryPath = new File("../puzzles");
@@ -19,7 +23,7 @@ class MainGui {
             ChessPuzzle puzzle = ChessBoardParser.parse(directoryPath + "/" + puzzlePath);
             String turn = puzzle.whiteTurn == true ? "WHITE" : "BLACK";
             Gui gui = new Gui(puzzle.board, turn);
-            ArrayList<ArrayList<Move>> moves =  puzzle.solvePuzzle();
+            ArrayList<ArrayList<Move>> moves =  puzzle.solvePuzzle(true, pool);
             ArrayList<Move> move = moves.get(0);
             gui.moves = move;
         } catch(Exception e){

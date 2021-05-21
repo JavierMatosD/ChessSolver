@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
 
 public class MoveTree {
     boolean isSolved;
@@ -11,36 +12,40 @@ public class MoveTree {
         this.isSolved = false;
     }
 
-    public ArrayList<ArrayList<Move>> solveTree(int maxDepth, boolean parallel) {
+    public ArrayList<ArrayList<Move>> solveTree(int maxDepth, boolean parallel, ExecutorService pool) {
 
         ArrayList<myMoveNode> myCurrentMoves = new ArrayList<>();
         ArrayList<oppMoveNode> oppCurrentMoves = new ArrayList<>();
         oppCurrentMoves.add(root);
         for (int i = 0; i < maxDepth; i++) {
             for (oppMoveNode n : oppCurrentMoves) { //set children of all oppCurrentMoves, put them in myCurrentMoves
-                n.setChildren(parallel);
+                n.setChildren(parallel, pool);
                 myCurrentMoves.addAll(n.children);
             }
             oppCurrentMoves.clear();
             for (myMoveNode n : myCurrentMoves) { //set children of all myCurrentMoves. Put them in oppCurrentMoves
                 if (ChessPuzzle.staticCheckCheck(!this.puzzle.whiteTurn, n.getBoardState())) { //do the ones that lead to check first
                     n.check = true;
-                    n.setChildren(parallel);
+                    n.setChildren(parallel, pool);
                     oppCurrentMoves.addAll(n.children);
                 }
             }
             for (myMoveNode n : myCurrentMoves) {
                 if (!n.check) {
-                    n.setChildren(parallel);
+                    n.setChildren(parallel, pool);
                     oppCurrentMoves.addAll(n.children);
-
+                    
                 }
+                
             }
             myCurrentMoves.clear();
-            if (root.checkMate)
+            if (root.checkMate){
+                
                 return root.getSolutions();
-
+            }
+            
         }
+        
         return root.getSolutions();
 
     }
@@ -68,11 +73,12 @@ public class MoveTree {
             return this.value.executeMove(this.parent.getBoardState());
         }
 
-        public void setChildren(boolean parallel) {
+        public void setChildren(boolean parallel, ExecutorService pool) {
             ChessPiece[][] boardState = this.getBoardState();
             ArrayList<Move> moves = new ArrayList<Move>();
             if(parallel){
-                moves = new ChessPuzzle(this.puzzle.whiteTurn, boardState).getLegalMovesParallel();
+                ChessPuzzle cp = new ChessPuzzle(this.puzzle.whiteTurn, boardState);
+                moves = cp.getLegalMovesParallel(pool);
             } else {
                 moves = new ChessPuzzle(this.puzzle.whiteTurn, boardState).getLegalMoves();
             }
@@ -149,20 +155,21 @@ public class MoveTree {
 
 
         //sets the children, or sets checkMate to true and parent checkmate to true
-        public void setChildren(boolean parallel) {
+        public void setChildren(boolean parallel, ExecutorService pool) {
             ChessPiece[][] boardState = this.getBoardState();
             //the state of the board after your move
             ChessPuzzle p = new ChessPuzzle(!this.puzzle.whiteTurn, boardState); 
             //all of the opponent's legal moves
             ArrayList<Move> oppMoves = new ArrayList<Move>();
             if (parallel) {
-                oppMoves = p.getLegalMovesParallel();
+                oppMoves = p.getLegalMovesParallel(pool);
             } else {
                 oppMoves = p.getLegalMoves();
             }
-          
+            
             if (oppMoves.size() == 0 && p.checkCheckNoMove(p.whiteTurn)) { //if opponent is in check and has no legal moves
                 this.checkMate = true;
+                
                 parent.setCheckMate(); //set parent to checkmate, since you know if parent move is made, child move can mate them
                 return;
             }
