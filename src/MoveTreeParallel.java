@@ -1,42 +1,57 @@
 import java.util.LinkedList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class MoveTree {
-    boolean isSolved;
+public class MoveTreeParallel {
+    AtomicBoolean isSolved;
     oppMoveNode root;
     ChessPuzzle puzzle;
+    ExecutorService pool;
 
-    public MoveTree(ChessPuzzle puzzle) {
+    public MoveTreeParallel(ChessPuzzle puzzle, ExecutorService pool) {
         this.puzzle = puzzle;
         this.root = new oppMoveNode(null, null, puzzle);
-        this.isSolved = false;
+        this.isSolved = new AtomicBoolean(false);
+        this.pool = pool;
     }
 
     public LinkedList<LinkedList<Move>> solveTree(int maxDepth) {
 
-        LinkedList<myMoveNode> myCurrentMoves = new LinkedList<>();
-        LinkedList<oppMoveNode> oppCurrentMoves = new LinkedList<>();
+        ConcurrentLinkedQueue<myMoveNode> myCurrentMoves = new ConcurrentLinkedQueue<>();
+        ConcurrentLinkedQueue<oppMoveNode> oppCurrentMoves = new ConcurrentLinkedQueue<>();
+
+
         oppCurrentMoves.add(root);
         for (int i = 0; i < maxDepth; i++) {
-            for (oppMoveNode n : oppCurrentMoves) { //set children of all oppCurrentMoves, put them in myCurrentMoves
-                n.setChildren();
-                myCurrentMoves.addAll(n.children);
+
+            CountDownLatch latch = new CountDownLatch(oppCurrentMoves.size());
+            for (Node n : oppCurrentMoves) { //set children of all oppCurrentMoves, put them in myCurrentMoves
+                pool.execute(new setChildrenTask<>(n, myCurrentMoves, latch));
+            }
+            try {
+                latch.await();
+            } catch (InterruptedException e){
+                System.out.println("Latch interrupted. That's not good.");
+                System.exit(-1);
             }
             oppCurrentMoves.clear();
+
+
+            latch = new CountDownLatch(myCurrentMoves.size());
+
             //set children of all myCurrentMoves. Put them in oppCurrentMoves
-            if (i < maxDepth - 1) {
-//                for (myMoveNode n : myCurrentMoves) { //iterate over all moves, set children for those leading to check
-//                    if (ChessPuzzle.staticCheckCheck(!this.puzzle.whiteTurn, n.getBoardState())) {
-//                        n.check = true;
-//                        n.setChildren();
-//                        oppCurrentMoves.addAll(n.children);
-//                    }
-//                }
-                for (myMoveNode n : myCurrentMoves) { //set children for the rest
-                    if (!n.check) {
-                        n.setChildren();
-                        oppCurrentMoves.addAll(n.children);
-                    }
+            if (i < maxDepth - 1) { //TODO: check those with check first?
+                for (Node n : myCurrentMoves) { //set children for the rest
+                    pool.execute(new setChildrenTask<>(n, oppCurrentMoves, latch));
+                }
+                try {
+                    latch.await();
+                } catch (InterruptedException e){
+                    System.out.println("Latch interrupted. That's not good.");
+                    System.exit(-1);
                 }
             }
             else { //when on the last level
@@ -44,8 +59,9 @@ public class MoveTree {
                     n.setChildrenPrune();
                 }
             }
+
             myCurrentMoves.clear();
-            if (root.checkMate) {
+            if (root.checkMate.get()) {
 
                 return root.getSolutions();
             }
@@ -61,7 +77,7 @@ public class MoveTree {
         myMoveNode parent; //null for root node
         LinkedList<myMoveNode> children;
         Move value; //null for root node
-        boolean checkMate; //true if true for any children
+        AtomicBoolean checkMate; //true if true for any children
         ChessPuzzle puzzle;
         MoveTree tree;
 
@@ -71,6 +87,7 @@ public class MoveTree {
             this.parent = parent;
             this.puzzle = puzzle;
             this.children = new LinkedList<>();
+            this.checkMate = new AtomicBoolean(false);
         }
 
         public ChessPiece[][] getBoardState() {
@@ -87,31 +104,27 @@ public class MoveTree {
 
 
             for (Move m : moves) {
-                children.add(new myMoveNode(m, this, this.puzzle));
+                this.children.add(new myMoveNode(m, this, this.puzzle));
             }
         }
 
         //if any children lead to mate, return true
-        public boolean checkChildren() {
-            for (myMoveNode child : children) {
-                if (child.checkMate)
-                    return true;
-            }
-            return false;
+        public LinkedList<myMoveNode> getChildren(){
+            return this.children;
         }
 
         //sets this node to checkmate. Checks parents too. Triggered by child
         public void setCheckMate() {
-            this.checkMate = true;
+            this.checkMate.set(true);
             if (parent != null)
                 parent.triggeredCheckCheckMate();
-            else isSolved = true;
+            else isSolved.set(true);
         }
 
         public LinkedList<LinkedList<Move>> getSolutions() {
             LinkedList<LinkedList<Move>> solutions = new LinkedList<>();
             for (myMoveNode child : children) {
-                if (child.checkMate) {
+                if (child.checkMate.get()) {
                     solutions.addAll(child.getSolutions()); //get solutions from child
                     for (LinkedList<Move> solution : solutions) //prepend this node's move to each solution
                         if (this.value != null)
@@ -134,16 +147,17 @@ public class MoveTree {
         oppMoveNode parent;
         LinkedList<oppMoveNode> children;
         Move value;
-        boolean checkMate; //set to true if true for all children
+        AtomicBoolean checkMate; //set to true if true for all children
         ChessPuzzle puzzle;
-        boolean check;
+        AtomicBoolean check;
 
         public myMoveNode(Move value, oppMoveNode parent, ChessPuzzle puzzle) {
             this.value = value;
             this.parent = parent;
             this.puzzle = puzzle;
             this.children = new LinkedList<>();
-            this.check = false;
+            this.check = new AtomicBoolean(false);
+            this.checkMate = new AtomicBoolean(false);
         }
 
         public String toString() {
@@ -168,7 +182,7 @@ public class MoveTree {
 
 
             if (oppMoves.size() == 0 && p.checkCheckNoMove(p.whiteTurn)) { //if opponent is in check and has no legal moves
-                this.checkMate = true;
+                this.checkMate.set(true);
 
                 parent.setCheckMate(); //set parent to checkmate, since you know if parent move is made, child move can mate them
                 return;
@@ -176,7 +190,11 @@ public class MoveTree {
             for (Move m : oppMoves) {
                 children.add(new oppMoveNode(m, this, this.puzzle));
             }
-            this.checkMate = false;
+            this.checkMate.set(false);
+        }
+
+        public LinkedList<oppMoveNode> getChildren(){
+            return this.children;
         }
 
         //Checks for checkmate, prunes self if not
@@ -190,19 +208,19 @@ public class MoveTree {
 
 
             if (oppMoves.size() == 0 && p.checkCheckNoMove(p.whiteTurn)) { //if opponent is in check and has no legal moves
-                this.checkMate = true;
+                this.checkMate.set(true);
 
                 parent.setCheckMate(); //set parent to checkmate, since you know if parent move is made, child move can mate them
                 return;
             }
-            this.checkMate = false;
+            this.checkMate .set(false);
             this.parent.children.remove(this); //prune self from tree
         }
 
         //if all children lead to mate, return true
         public boolean checkChildren() {
             for (oppMoveNode child : children) {
-                if (!child.checkMate)
+                if (!child.checkMate.get())
                     return false;
             }
             return true;
@@ -211,7 +229,7 @@ public class MoveTree {
         //check if this node is checkmate by checking if all children are checkmate. Triggered by children.
         public void triggeredCheckCheckMate() {
             if (checkChildren()) {
-                this.checkMate = true;
+                this.checkMate.set(true);
                 parent.setCheckMate();
             }
         }
@@ -240,8 +258,11 @@ public class MoveTree {
     abstract class Node{
         Move value;
         boolean checkmate;
-
+        boolean check;
+        LinkedList children;
         public abstract void setChildren();
+        public abstract LinkedList getChildren();
+
     }
 }
 

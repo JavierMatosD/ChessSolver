@@ -23,6 +23,7 @@ public class ChessPuzzle {
     int whiteKingYPos;
     public static boolean parallel;
     public static ExecutorService pool;
+    public boolean superParallel;
 
     public ChessPuzzle(boolean whiteTurn, ChessPiece[][] board) {
         this.board = board;
@@ -147,6 +148,11 @@ public class ChessPuzzle {
 
     public LinkedList<LinkedList<Move>> solvePuzzle() {
         MoveTree mt = new MoveTree(this);
+        return mt.solveTree(3);
+    }
+
+    public LinkedList<LinkedList<Move>> solvePuzzleSuperParallel(ExecutorService pool) {
+        MoveTreeParallel mt = new MoveTreeParallel(this, pool);
         return mt.solveTree(3);
     }
 

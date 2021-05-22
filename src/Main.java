@@ -29,22 +29,22 @@ public class Main {
 
             System.out.println(s + " tree: " + puzzle.solvePuzzle());
             long end = System.nanoTime();
-
-
             long mstime = ((end - start) / 1_000_000);
             System.out.println("Took " + mstime + " ms to solve this puzzle.");
             start = System.nanoTime();
 
             puzzle.addPool(pool);
+
             System.out.println(s + " tree: " + puzzle.solvePuzzle());
-
-             end = System.nanoTime();
-
-
+            end = System.nanoTime();
             mstime = ((end - start) / 1_000_000);
             System.out.println("Took " + mstime + " ms to solve this puzzle with parallelism.");
-            //            System.out.println(s + " one only: " +puzzle.solvePuzzleOneMove());
 
+            puzzle.parallel = false;
+            System.out.println(s + " tree: " + puzzle.solvePuzzleSuperParallel(pool));
+            end = System.nanoTime();
+            mstime = ((end - start) / 1_000_000);
+            System.out.println("Took " + mstime + " ms to solve this puzzle with super parallelism.");
         }
         pool.shutdown();
 
