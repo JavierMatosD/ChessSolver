@@ -1,8 +1,8 @@
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class oppMoveNode {
     myMoveNode parent; //null for root node
-    ArrayList<myMoveNode> children;
+    LinkedList<myMoveNode> children;
     Move value; //null for root node
     boolean checkMate; //true if true for any children
     ChessPuzzle puzzle;
@@ -12,7 +12,7 @@ public class oppMoveNode {
         this.value = value;
         this.parent = parent;
         this.puzzle = puzzle;
-        this.children = new ArrayList<>();
+        this.children = new LinkedList<>();
     }
 
     public ChessPiece[][] getBoardState() {
@@ -24,7 +24,7 @@ public class oppMoveNode {
     public void setChildren() {
 
         ChessPiece[][] boardState = this.getBoardState();
-        ArrayList<Move> moves = new ChessPuzzle(this.puzzle.whiteTurn, boardState).getLegalMoves();
+        LinkedList<Move> moves = new ChessPuzzle(this.puzzle.whiteTurn, boardState).getLegalMoves();
         for (Move m : moves) {
             children.add(new myMoveNode(m, this, this.puzzle));
         }
@@ -47,12 +47,12 @@ public class oppMoveNode {
         else isSolved = true;
     }
 
-    public ArrayList<ArrayList<Move>> getSolutions() {
-        ArrayList<ArrayList<Move>> solutions = new ArrayList<>();
+    public LinkedList<LinkedList<Move>> getSolutions() {
+        LinkedList<LinkedList<Move>> solutions = new LinkedList<>();
         for (myMoveNode child : children) {
             if (child.checkMate) {
                 solutions.addAll(child.getSolutions()); //get solutions from child
-                for (ArrayList<Move> solution : solutions) //prepend this node's move to each solution
+                for (LinkedList<Move> solution : solutions) //prepend this node's move to each solution
                     if (this.value != null)
                         solution.add(0, this.value);
                 break; //break out of loop, since checkmating move found. To find all checkmate moves, comment this out
@@ -70,7 +70,7 @@ public class oppMoveNode {
 
     static class myMoveNode {
         oppMoveNode parent;
-        ArrayList<oppMoveNode> children;
+        LinkedList<oppMoveNode> children;
         Move value;
         boolean checkMate; //set to true if true for all children
         ChessPuzzle puzzle;
@@ -79,7 +79,7 @@ public class oppMoveNode {
             this.value = value;
             this.parent = parent;
             this.puzzle = puzzle;
-            this.children = new ArrayList<>();
+            this.children = new LinkedList<>();
         }
 
         public String toString() {
@@ -97,7 +97,7 @@ public class oppMoveNode {
         public void setChildren() {
             ChessPiece[][] boardState = this.getBoardState();
             ChessPuzzle p = new ChessPuzzle(!this.puzzle.whiteTurn, boardState); //the state of the board after your move
-            ArrayList<Move> oppMoves = p.getLegalMoves(); //all of the opponent's legal moves
+            LinkedList<Move> oppMoves = p.getLegalMoves(); //all of the opponent's legal moves
             if (oppMoves.size() == 0 && p.checkCheckNoMove(p.whiteTurn)) { //if opponent is in check and has no legal moves
                 this.checkMate = true;
                 parent.setCheckMate(); //set parent to checkmate, since you know if parent move is made, child move can mate them
@@ -125,19 +125,19 @@ public class oppMoveNode {
             parent.setCheckMate();
         }}
 
-        public ArrayList<ArrayList<Move>> getSolutions() {
-            ArrayList<ArrayList<Move>> solutions = new ArrayList<>(); //for debugging, can be removed
+        public LinkedList<LinkedList<Move>> getSolutions() {
+            LinkedList<LinkedList<Move>> solutions = new LinkedList<>(); //for debugging, can be removed
             if (this.children.size() == 0) { //if this node has no children, it's a mate in 1 move
-                ArrayList<Move> toAdd = new ArrayList<>();
+                LinkedList<Move> toAdd = new LinkedList<>();
                 toAdd.add(this.value);
-                solutions = new ArrayList<>();
+                solutions = new LinkedList<>();
                 solutions.add(toAdd);
                 return solutions;
             }
             for (oppMoveNode child : children) {
                 solutions.addAll(child.getSolutions()); //get solutions from child
             }
-            for (ArrayList<Move> solution : solutions) //prepend this node's move to each solution
+            for (LinkedList<Move> solution : solutions) //prepend this node's move to each solution
                 solution.add(0, this.value);
             return solutions;
         }

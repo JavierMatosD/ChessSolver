@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 
 public class MoveTree {
@@ -12,10 +12,10 @@ public class MoveTree {
         this.isSolved = false;
     }
 
-    public ArrayList<ArrayList<Move>> solveTree(int maxDepth) {
+    public LinkedList<LinkedList<Move>> solveTree(int maxDepth) {
 
-        ArrayList<myMoveNode> myCurrentMoves = new ArrayList<>();
-        ArrayList<oppMoveNode> oppCurrentMoves = new ArrayList<>();
+        LinkedList<myMoveNode> myCurrentMoves = new LinkedList<>();
+        LinkedList<oppMoveNode> oppCurrentMoves = new LinkedList<>();
         oppCurrentMoves.add(root);
         for (int i = 0; i < maxDepth; i++) {
             for (oppMoveNode n : oppCurrentMoves) { //set children of all oppCurrentMoves, put them in myCurrentMoves
@@ -32,20 +32,23 @@ public class MoveTree {
             }
             for (myMoveNode n : myCurrentMoves) {
                 if (!n.check) {
-                    n.setChildren();
-                    oppCurrentMoves.addAll(n.children);
-                    
+                    if(i==maxDepth-1)
+                    n.setChildrenPrune();
+                    else {
+                        n.setChildren();
+                        oppCurrentMoves.addAll(n.children);
+                    }
                 }
-                
+
             }
             myCurrentMoves.clear();
-            if (root.checkMate){
-                
+            if (root.checkMate) {
+
                 return root.getSolutions();
             }
-            
+
         }
-        
+
         return root.getSolutions();
 
     }
@@ -53,7 +56,7 @@ public class MoveTree {
 
     public class oppMoveNode {
         myMoveNode parent; //null for root node
-        ArrayList<myMoveNode> children;
+        LinkedList<myMoveNode> children;
         Move value; //null for root node
         boolean checkMate; //true if true for any children
         ChessPuzzle puzzle;
@@ -64,7 +67,7 @@ public class MoveTree {
             this.value = value;
             this.parent = parent;
             this.puzzle = puzzle;
-            this.children = new ArrayList<>();
+            this.children = new LinkedList<>();
         }
 
         public ChessPiece[][] getBoardState() {
@@ -74,12 +77,12 @@ public class MoveTree {
         }
 
         public void setChildren() {
+//            System.out.println("Setting children for " + this.value);
             ChessPiece[][] boardState = this.getBoardState();
-            ArrayList<Move> moves = new ArrayList<Move>();
 
-                moves = new ChessPuzzle(this.puzzle.whiteTurn, boardState).getLegalMoves();
+            LinkedList<Move> moves = new ChessPuzzle(this.puzzle.whiteTurn, boardState).getLegalMoves();
 
-            
+
             for (Move m : moves) {
                 children.add(new myMoveNode(m, this, this.puzzle));
             }
@@ -102,12 +105,12 @@ public class MoveTree {
             else isSolved = true;
         }
 
-        public ArrayList<ArrayList<Move>> getSolutions() {
-            ArrayList<ArrayList<Move>> solutions = new ArrayList<>();
+        public LinkedList<LinkedList<Move>> getSolutions() {
+            LinkedList<LinkedList<Move>> solutions = new LinkedList<>();
             for (myMoveNode child : children) {
                 if (child.checkMate) {
                     solutions.addAll(child.getSolutions()); //get solutions from child
-                    for (ArrayList<Move> solution : solutions) //prepend this node's move to each solution
+                    for (LinkedList<Move> solution : solutions) //prepend this node's move to each solution
                         if (this.value != null)
                             solution.add(0, this.value);
                     break; //break out of loop, since checkmating move found. To find all checkmate moves, comment this out
@@ -126,7 +129,7 @@ public class MoveTree {
 
     class myMoveNode {
         oppMoveNode parent;
-        ArrayList<oppMoveNode> children;
+        LinkedList<oppMoveNode> children;
         Move value;
         boolean checkMate; //set to true if true for all children
         ChessPuzzle puzzle;
@@ -136,7 +139,7 @@ public class MoveTree {
             this.value = value;
             this.parent = parent;
             this.puzzle = puzzle;
-            this.children = new ArrayList<>();
+            this.children = new LinkedList<>();
             this.check = false;
         }
 
@@ -156,16 +159,14 @@ public class MoveTree {
 
             ChessPiece[][] boardState = this.getBoardState();
             //the state of the board after your move
-            ChessPuzzle p = new ChessPuzzle(!this.puzzle.whiteTurn, boardState); 
+            ChessPuzzle p = new ChessPuzzle(!this.puzzle.whiteTurn, boardState);
             //all of the opponent's legal moves
-            ArrayList<Move> oppMoves = new ArrayList<Move>();
+            LinkedList<Move> oppMoves = p.getLegalMoves();
 
-                oppMoves = p.getLegalMoves();
 
-            
             if (oppMoves.size() == 0 && p.checkCheckNoMove(p.whiteTurn)) { //if opponent is in check and has no legal moves
                 this.checkMate = true;
-                
+
                 parent.setCheckMate(); //set parent to checkmate, since you know if parent move is made, child move can mate them
                 return;
             }
@@ -174,7 +175,25 @@ public class MoveTree {
             }
             this.checkMate = false;
         }
+        //Checks for checkmate, prunes self if not
+        public void setChildrenPrune() {
 
+            ChessPiece[][] boardState = this.getBoardState();
+            //the state of the board after your move
+            ChessPuzzle p = new ChessPuzzle(!this.puzzle.whiteTurn, boardState);
+            //all of the opponent's legal moves
+            LinkedList<Move> oppMoves = p.getLegalMoves();
+
+
+            if (oppMoves.size() == 0 && p.checkCheckNoMove(p.whiteTurn)) { //if opponent is in check and has no legal moves
+                this.checkMate = true;
+
+                parent.setCheckMate(); //set parent to checkmate, since you know if parent move is made, child move can mate them
+                return;
+            }
+            this.checkMate = false;
+            this.parent.children.remove(this); //prune self from tree
+        }
         //if all children lead to mate, return true
         public boolean checkChildren() {
             for (oppMoveNode child : children) {
@@ -193,19 +212,19 @@ public class MoveTree {
         }
 
 
-        public ArrayList<ArrayList<Move>> getSolutions() {
-            ArrayList<ArrayList<Move>> solutions = new ArrayList<>(); //for debugging, can be removed
+        public LinkedList<LinkedList<Move>> getSolutions() {
+            LinkedList<LinkedList<Move>> solutions = new LinkedList<>(); //for debugging, can be removed
             if (this.children.size() == 0) { //if this node has no children, it's a mate in 1 move
-                ArrayList<Move> toAdd = new ArrayList<>();
+                LinkedList<Move> toAdd = new LinkedList<>();
                 toAdd.add(this.value);
-                solutions = new ArrayList<>();
+                solutions = new LinkedList<>();
                 solutions.add(toAdd);
                 return solutions;
             }
             for (oppMoveNode child : children) {
                 solutions.addAll(child.getSolutions()); //get solutions from child
             }
-            for (ArrayList<Move> solution : solutions) //prepend this node's move to each solution
+            for (LinkedList<Move> solution : solutions) //prepend this node's move to each solution
                 solution.add(0, this.value);
             return solutions;
         }

@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 // testing chessboard graphics
 
@@ -29,8 +29,8 @@ public class testBoard {
         // // who's turn was it ? "BLACK"/"WHITE"
         // Gui gui = new Gui(chessPieces, "WHITE");
 
-        // // arraylist of moves
-        // ArrayList<Move> moves = new ArrayList<>();
+        // // LinkedList of moves
+        // LinkedList<Move> moves = new LinkedList<>();
         // moves.add(new Move(chessPieces[0][1], 0, 0, 3, 0));
         // gui.moves = moves;
         MainGui gui = new MainGui();

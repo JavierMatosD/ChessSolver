@@ -1,4 +1,4 @@
-//import java.util.ArrayList;
+//import java.util.LinkedList;
 //
 //public class UnitTests {
 //    public static boolean rookMovesTest(){
@@ -16,7 +16,7 @@
 //
 //        // place rook on board
 //        board[4][3] = rook;
-//        ArrayList<Move> rookMoves = ChessPuzzle.getRookMoves(4, 3, board);
+//        LinkedList<Move> rookMoves = ChessPuzzle.getRookMoves(4, 3, board);
 //
 //        // Validate
 //        System.out.println(rookMoves.size());
@@ -30,7 +30,7 @@
 //        return toReturn;
 //    }
 //
-//    public static void printMoves(ArrayList<Move> move) {
+//    public static void printMoves(LinkedList<Move> move) {
 //        for (Move move2 : move)
 //            System.out.println(
 //            move2.chessPiece.toString() + " from ("

@@ -105,7 +105,7 @@ public class ChessPuzzle {
 
     //returns the first move found resulting in checkmate
     public Move solvePuzzleOneMove() {
-        ArrayList<Move> legalMoves = this.getLegalMoves();
+        LinkedList<Move> legalMoves = this.getLegalMoves();
         Iterator itr = legalMoves.iterator();
         while (itr.hasNext()) {
             if (!checkCheck((Move) itr.next(), !this.whiteTurn, this.board)) //if a move does not lead to check on the opposing king, remove it
@@ -120,7 +120,7 @@ public class ChessPuzzle {
         return null;
     }
 
-    public ArrayList<ArrayList<Move>> nodeSolvePuzzle() {
+    public LinkedList<LinkedList<Move>> nodeSolvePuzzle() {
         oppMoveNode root = new oppMoveNode(null, null, this);
         root.setChildren();
         for (oppMoveNode.myMoveNode n : root.children) {
@@ -128,14 +128,14 @@ public class ChessPuzzle {
         }
         if (root.checkMate)
             return root.getSolutions();
-        ArrayList<oppMoveNode.myMoveNode> children = root.children;
+        LinkedList<oppMoveNode.myMoveNode> children = root.children;
         for (int i = 0; i < children.size(); i++) {
             oppMoveNode.myMoveNode n = children.get(i);
-            ArrayList<oppMoveNode> oppMoveNodes = n.children;
+            LinkedList<oppMoveNode> oppMoveNodes = n.children;
             for (int i1 = 0; i1 < oppMoveNodes.size(); i1++) {
                 oppMoveNode m = oppMoveNodes.get(i1);
                 m.setChildren();
-                ArrayList<oppMoveNode.myMoveNode> myMoveNodes = m.children;
+                LinkedList<oppMoveNode.myMoveNode> myMoveNodes = m.children;
                 for (int i2 = 0; i2 < myMoveNodes.size(); i2++) {
                     oppMoveNode.myMoveNode a = myMoveNodes.get(i2);
                     a.setChildren();
@@ -145,7 +145,7 @@ public class ChessPuzzle {
         return root.getSolutions();
     }
 
-    public ArrayList<ArrayList<Move>> solvePuzzle() {
+    public LinkedList<LinkedList<Move>> solvePuzzle() {
         MoveTree mt = new MoveTree(this);
         return mt.solveTree(3);
     }
@@ -164,9 +164,9 @@ public class ChessPuzzle {
      *
      * @return Array of Move's
      */
-    public ArrayList<Move> getLegalMovesIgnoreCheck(boolean whiteTurn) {
+    public LinkedList<Move> getLegalMovesIgnoreCheck(boolean whiteTurn) {
 
-        ArrayList<Move> legalMoves = new ArrayList<Move>();
+        LinkedList<Move> legalMoves = new LinkedList<Move>();
 
         for (int i = 0; i < 8; i++)
             for (int j = 0; j < 8; j++) {
@@ -180,10 +180,10 @@ public class ChessPuzzle {
      * The above version is for checking for check; that is, you can't make a move putting yourself in check, even if the move your opp
      * would make to take your king would put himself in check too
      */
-    public ArrayList<Move> getLegalMoves() {
+    public LinkedList<Move> getLegalMoves() {
         if(parallel)
             return getLegalMovesParallel();
-        ArrayList<Move> moves = new ArrayList<Move>();
+        LinkedList<Move> moves = new LinkedList<Move>();
 
         for (int i = 0; i < 8; i++)
             for (int j = 0; j < 8; j++) {
@@ -200,10 +200,10 @@ public class ChessPuzzle {
     /**
      * Same as getLegalMoves but parallelized
      */
-    public ArrayList<Move> getLegalMovesParallel() {
+    public LinkedList<Move> getLegalMovesParallel() {
         
-        ArrayList<Move> moves = new ArrayList<Move>();
-        ArrayList<Move> legalMoves = new ArrayList<Move>();
+        LinkedList<Move> moves = new LinkedList<Move>();
+        LinkedList<Move> legalMoves = new LinkedList<Move>();
 
         for (int i = 0; i < 8; i++)
             for (int j = 0; j < 8; j++) {
@@ -219,7 +219,7 @@ public class ChessPuzzle {
             sharedMoves.getAndSet(i, false);
         }
         
-        ArrayList<Callable<getLegalMovesTask>> tasks = new ArrayList();
+        LinkedList<Callable<getLegalMovesTask>> tasks = new LinkedList();
         for (int i = 0; itr.hasNext(); i++) {
             ChessPuzzle board = new ChessPuzzle(this.whiteTurn, this.board);
             Move tmpMove = (Move) itr.next();
@@ -250,8 +250,8 @@ public class ChessPuzzle {
      * @param y_start y position of chess piece
      * @return List of legal moves
      */
-    public ArrayList<Move> getLocationLegalMoves(int x_start, int y_start, boolean whiteTurn) {
-        ArrayList<Move> moves = new ArrayList<>();
+    public LinkedList<Move> getLocationLegalMoves(int x_start, int y_start, boolean whiteTurn) {
+        LinkedList<Move> moves = new LinkedList<>();
         if (board[x_start][y_start].isWhite() != whiteTurn)
             return moves;
         try {
@@ -304,8 +304,8 @@ public class ChessPuzzle {
      * @param board chess board
      * @return list of moves
      */
-    public ArrayList<Move> getKingMoves(int row, int col, ChessPiece[][] board) {
-        ArrayList<Move> moves = new ArrayList<>();
+    public LinkedList<Move> getKingMoves(int row, int col, ChessPiece[][] board) {
+        LinkedList<Move> moves = new LinkedList<>();
         ChessPiece king = new ChessPiece(type.KING, this.whiteTurn);
 
         // Check up and down
@@ -339,7 +339,7 @@ public class ChessPuzzle {
         if (this.whiteTurn && board[7][7].getMyType() == type.ROOK && board[7][7].isWhite()
                 && board[7][4].getMyType() == type.KING && board[7][4].isWhite()) {
             //create new puzzle with other player's turn, same board, and calculate their moves
-            ArrayList<Move> oppMoves = new ChessPuzzle(!this.whiteTurn, this.board).getLegalMovesIgnoreCheck(!this.whiteTurn);
+            LinkedList<Move> oppMoves = new ChessPuzzle(!this.whiteTurn, this.board).getLegalMovesIgnoreCheck(!this.whiteTurn);
             //check that all spots along the way are not threatened and are empty
             if (!checkThreatened(7, 4, oppMoves)
                     && !checkThreatened(7, 5, oppMoves) && board[7][5].isEmpty()
@@ -352,7 +352,7 @@ public class ChessPuzzle {
         if (this.whiteTurn && board[7][0].getMyType() == type.ROOK && board[7][0].isWhite()
                 && board[7][4].getMyType() == type.KING && board[7][4].isWhite()) {
             //create new puzzle with other player's turn, same board, and calculate their moves
-            ArrayList<Move> oppMoves = new ChessPuzzle(!this.whiteTurn, this.board).getLegalMovesIgnoreCheck(!this.whiteTurn);
+            LinkedList<Move> oppMoves = new ChessPuzzle(!this.whiteTurn, this.board).getLegalMovesIgnoreCheck(!this.whiteTurn);
             //check that all spots along the way are not threatened and are empty
             if (!checkThreatened(7, 4, oppMoves)
                     && !checkThreatened(7, 3, oppMoves) && board[7][3].isEmpty()
@@ -364,7 +364,7 @@ public class ChessPuzzle {
         if (!this.whiteTurn && board[0][7].getMyType() == type.ROOK && !board[0][7].isWhite()
                 && board[0][4].getMyType() == type.KING && !board[0][4].isWhite()) {
             //create new puzzle with other player's turn, same board, and calculate their moves
-            ArrayList<Move> oppMoves = new ChessPuzzle(!this.whiteTurn, this.board).getLegalMovesIgnoreCheck(!this.whiteTurn);
+            LinkedList<Move> oppMoves = new ChessPuzzle(!this.whiteTurn, this.board).getLegalMovesIgnoreCheck(!this.whiteTurn);
             //check that all spots along the way are not threatened and are empty
             if (!checkThreatened(0, 4, oppMoves)
                     && !checkThreatened(0, 5, oppMoves) && board[0][5].isEmpty()
@@ -377,7 +377,7 @@ public class ChessPuzzle {
         if (!this.whiteTurn && board[0][0].getMyType() == type.ROOK && !board[0][0].isWhite()
                 && board[0][4].getMyType() == type.KING && !board[0][4].isWhite()) {
             //create new puzzle with other player's turn, same board, and calculate their moves
-            ArrayList<Move> oppMoves = new ChessPuzzle(!this.whiteTurn, this.board).getLegalMovesIgnoreCheck(!this.whiteTurn);
+            LinkedList<Move> oppMoves = new ChessPuzzle(!this.whiteTurn, this.board).getLegalMovesIgnoreCheck(!this.whiteTurn);
             //check that all spots along the way are not threatened and are empty
             if (!checkThreatened(0, 4, oppMoves)
                     && !checkThreatened(0, 3, oppMoves) && board[0][3].isEmpty()
@@ -397,8 +397,8 @@ public class ChessPuzzle {
      * @param board chess board
      * @return list of moves
      */
-    public ArrayList<Move> getKnightMoves(int row, int col, ChessPiece[][] board) {
-        ArrayList<Move> moves = new ArrayList<>();
+    public LinkedList<Move> getKnightMoves(int row, int col, ChessPiece[][] board) {
+        LinkedList<Move> moves = new LinkedList<>();
         ChessPiece knight = new ChessPiece(type.KNIGHT, this.whiteTurn);
 
         // (two spaces to the left and one up or down)
@@ -448,8 +448,8 @@ public class ChessPuzzle {
      * @param board chess board
      * @return list of moves
      */
-    public ArrayList<Move> getQueenMoves(int x, int y, ChessPiece[][] board) {
-        ArrayList<Move> moves = new ArrayList<>();
+    public LinkedList<Move> getQueenMoves(int x, int y, ChessPiece[][] board) {
+        LinkedList<Move> moves = new LinkedList<>();
         ChessPiece queen = new ChessPiece(type.QUEEN, this.whiteTurn);
 
         //----------Check Horizontal and Vertical Movement--------------//
@@ -579,9 +579,9 @@ public class ChessPuzzle {
      * @param board chess board
      * @return list of moves
      */
-    public ArrayList<Move> getBishopMoves(int row, int col, ChessPiece[][] board) {
+    public LinkedList<Move> getBishopMoves(int row, int col, ChessPiece[][] board) {
 
-        ArrayList<Move> moves = new ArrayList<>();
+        LinkedList<Move> moves = new LinkedList<>();
         ChessPiece bishop = new ChessPiece(type.BISHOP, this.whiteTurn);
 
         // temp variable so as to not modify original col
@@ -667,9 +667,9 @@ public class ChessPuzzle {
      * @param board chess board
      * @return list of moves
      */
-    public ArrayList<Move> getPawnMoves(int row, int col, ChessPiece[][] board) {
+    public LinkedList<Move> getPawnMoves(int row, int col, ChessPiece[][] board) {
 
-        ArrayList<Move> moves = new ArrayList<>();
+        LinkedList<Move> moves = new LinkedList<>();
         ChessPiece pawn = new ChessPiece(type.PAWN, this.whiteTurn);
         boolean whitePawn = board[row][col].isWhite();
         boolean firstMove = ((row == 6 && whitePawn) || (row == 1) && !whitePawn) ? true : false;
@@ -743,10 +743,10 @@ public class ChessPuzzle {
      * @param y_start
      * @return
      */
-    public ArrayList<Move> getRookMoves(int x_start, int y_start, ChessPiece[][] board) {
+    public LinkedList<Move> getRookMoves(int x_start, int y_start, ChessPiece[][] board) {
 
         ChessPiece rook = new ChessPiece(type.ROOK, this.whiteTurn);
-        ArrayList<Move> moves = new ArrayList<>();
+        LinkedList<Move> moves = new LinkedList<>();
 
         // Check right movement
         for (int i = x_start + 1; i < 8; i++) {
@@ -803,7 +803,7 @@ public class ChessPuzzle {
      */
     public boolean checkCheck(Move move, boolean checkWhite, ChessPiece[][] board) {
         ChessPuzzle p = new ChessPuzzle(!checkWhite, move.executeMove(board)); //create a new puzzle that represents the state after the move is executed
-        ArrayList<Move> oppMoves = p.getLegalMovesIgnoreCheck(p.whiteTurn); //get all the moves the opponent can make
+        LinkedList<Move> oppMoves = p.getLegalMovesIgnoreCheck(p.whiteTurn); //get all the moves the opponent can make
         //iterate over those moves, see if any of them lead to capturing the king. If so, this move leads to check
 
         if (checkWhite)
@@ -815,7 +815,7 @@ public class ChessPuzzle {
 
     public static boolean staticCheckCheck(boolean checkWhite, ChessPiece[][] board) {
         ChessPuzzle p = new ChessPuzzle(!checkWhite, board); //create a new puzzle that represents the state after the move is executed
-        ArrayList<Move> oppMoves = p.getLegalMovesIgnoreCheck(p.whiteTurn); //get all the moves the opponent can make
+        LinkedList<Move> oppMoves = p.getLegalMovesIgnoreCheck(p.whiteTurn); //get all the moves the opponent can make
         //iterate over those moves, see if any of them lead to capturing the king. If so, this move leads to check
         if (checkWhite)
             return p.checkThreatened(p.whiteKingXPos, p.whiteKingYPos, oppMoves);
@@ -826,7 +826,7 @@ public class ChessPuzzle {
 
     public boolean checkCheckNoMove(boolean checkWhite) {
         ChessPuzzle p = new ChessPuzzle(!checkWhite, this.board); //create a new puzzle that represents the state after the move is executed
-        ArrayList<Move> oppMoves = p.getLegalMovesIgnoreCheck(p.whiteTurn); //get all the moves the opponent can make
+        LinkedList<Move> oppMoves = p.getLegalMovesIgnoreCheck(p.whiteTurn); //get all the moves the opponent can make
         //iterate over those moves, see if any of them lead to capturing the king. If so, this move leads to check
         if (checkWhite)
             return p.checkThreatened(p.whiteKingXPos, p.whiteKingYPos, oppMoves);
@@ -836,7 +836,7 @@ public class ChessPuzzle {
     }
 
     //possibly could be made static? Probably not but worth considering.
-    public boolean checkThreatened(int xpos, int ypos, ArrayList<Move> moves) {
+    public boolean checkThreatened(int xpos, int ypos, LinkedList<Move> moves) {
         for (Move m : moves)
             if (m.x_end == xpos && m.y_end == ypos)
                 return true;
@@ -850,7 +850,7 @@ public class ChessPuzzle {
 
     }
 
-    public static ChessPiece[][] executeMoves(ArrayList<Move> moves, ChessPiece[][] board) {
+    public static ChessPiece[][] executeMoves(LinkedList<Move> moves, ChessPiece[][] board) {
         for (Move m : moves) {
             board = m.executeMove(board);
         }

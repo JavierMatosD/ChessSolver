@@ -37,12 +37,12 @@ class Gui extends JFrame {
     // labels
     String[] COLS = "ABCDEFGH".split("");
 
-    // arraylist of moves
-    ArrayList<Move> moves = new ArrayList<>();
+    // LinkedList of moves
+    LinkedList<Move> moves = new LinkedList<>();
     int currentMove = 0;
 
-    private ArrayList<Shape> separateShapeIntoRegions(Shape shape) {
-        ArrayList<Shape> regions = new ArrayList<Shape>();
+    private LinkedList<Shape> separateShapeIntoRegions(Shape shape) {
+        LinkedList<Shape> regions = new LinkedList<Shape>();
 
         PathIterator pi = shape.getPathIterator(null);
         int ii = 0;
@@ -99,7 +99,7 @@ class Gui extends JFrame {
         Area imageShapeArea = new Area(imageShape);
         Area shapeArea = new Area(shapeCentered);
         imageShapeArea.subtract(shapeArea);
-        ArrayList<Shape> regions = separateShapeIntoRegions(imageShapeArea);
+        LinkedList<Shape> regions = separateShapeIntoRegions(imageShapeArea);
         g.setStroke(new BasicStroke(1));
         g.setColor(pieceColors[side]);
         Color baseColor = pieceColors[side];
