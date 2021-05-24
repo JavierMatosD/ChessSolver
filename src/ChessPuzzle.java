@@ -4,10 +4,13 @@
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.AbstractCollection;
 
 /**
  * Constructor
@@ -176,7 +179,7 @@ public class ChessPuzzle {
 
         for (int i = 0; i < 8; i++)
             for (int j = 0; j < 8; j++) {
-                legalMoves.addAll(getLocationLegalMoves(i, j, whiteTurn));
+                legalMoves.addAll(getLocationLegalMoves(i, j, whiteTurn, this.board));
             }
         return legalMoves;
     }
@@ -193,7 +196,7 @@ public class ChessPuzzle {
 
         for (int i = 0; i < 8; i++)
             for (int j = 0; j < 8; j++) {
-                moves.addAll(getLocationLegalMoves(i, j, this.whiteTurn));
+                moves.addAll(getLocationLegalMoves(i, j, this.whiteTurn, this.board));
             }
 
         //if a move leads to check for the player whose turn it is, remove it
@@ -208,44 +211,80 @@ public class ChessPuzzle {
      */
     public LinkedList<Move> getLegalMovesParallel() {
         
+        // master list of moves
         LinkedList<Move> moves = new LinkedList<Move>();
+
+        // list of moves after removing all moves that place king in check
         LinkedList<Move> legalMoves = new LinkedList<Move>();
 
-        for (int i = 0; i < 8; i++)
-            for (int j = 0; j < 8; j++) {
-                moves.addAll(getLocationLegalMoves(i, j, this.whiteTurn));
+        // sharedList contains all the possible moves. It is shared by multiple threads
+        AtomicReferenceArray<LinkedList<Move>> sharedList = new AtomicReferenceArray<LinkedList<Move>>(64);
+        CountDownLatch latch = new CountDownLatch(64);
+
+        //================= Get location legal moves ==================== //
+        int id = 0;
+        for (int i = 0; i < 8; i++) 
+        {
+            for (int j = 0; j < 8; j++) 
+            {
+                ChessPuzzle p = new ChessPuzzle(this.whiteTurn, this.board);
+                pool.execute(new getLocationLegalMovesTask(p, i, j, id, sharedList, latch));
+                id++;
             }
+        }
 
+        try 
+        {
+            latch.await();
+        } catch (InterruptedException e) 
+        {
+            System.out.println("Latch interrupted. That's not good.");
+            System.exit(-1);
+        }
+        
+        // add all moves to main moves list
+        for (int i = 0; i < sharedList.length(); i++) 
+        {
+            if (sharedList.get(i) != null) 
+            {
+                moves.addAll(sharedList.get(i));
+            }
+        }
+
+
+        //=============== Remove all moves that place king in check =====================//
         Iterator itr = moves.iterator();
-
-        // array will determine which moves to remove
-        //boolean[] sharedMoves = new boolean[moves.size()];
         AtomicReferenceArray<Boolean> sharedMoves = new AtomicReferenceArray<>(moves.size());
-        for (int i = 0; i < sharedMoves.length(); i++) {
+        for (int i = 0; i < sharedMoves.length(); i++) 
+        {
             sharedMoves.getAndSet(i, false);
         }
         
-        LinkedList<Callable<getLegalMovesTask>> tasks = new LinkedList();
-        for (int i = 0; itr.hasNext(); i++) {
+        CountDownLatch latch2 = new CountDownLatch(moves.size());
+        for (int i = 0; itr.hasNext(); i++) 
+        {
             ChessPuzzle board = new ChessPuzzle(this.whiteTurn, this.board);
             Move tmpMove = (Move) itr.next();
-            getLegalMovesTask task = new getLegalMovesTask(sharedMoves, board, i, tmpMove);
-            tasks.add(task);
-            pool.execute(task);
-        }
-        try {
-            pool.invokeAll(tasks); //could also use latch
-        } catch( InterruptedException e){
+            pool.execute(new getLegalMovesTask(sharedMoves, board, i, tmpMove, latch2));
         }
 
+        try 
+        {
+            latch2.await();
+        } catch (InterruptedException e) 
+        {
+            System.out.println("Latch interrupted. That's not good.");
+            System.exit(-1);
+        }
         for (int i = 0; i < sharedMoves.length(); i++)
         {
-            if (!sharedMoves.get(i))
+            if (!sharedMoves.get(i)) 
             {
                 legalMoves.add(moves.get(i));
             }
         }
 
+        // Returns list of legal moves
         return legalMoves;
     }
 
@@ -256,35 +295,35 @@ public class ChessPuzzle {
      * @param y_start y position of chess piece
      * @return List of legal moves
      */
-    public LinkedList<Move> getLocationLegalMoves(int x_start, int y_start, boolean whiteTurn) {
+    public LinkedList<Move> getLocationLegalMoves(int x_start, int y_start, boolean whiteTurn, ChessPiece[][] Cboard) {
         LinkedList<Move> moves = new LinkedList<>();
-        if (board[x_start][y_start].isWhite() != whiteTurn)
+        if (Cboard[x_start][y_start].isWhite() != whiteTurn)
             return moves;
         try {
-            switch (board[x_start][y_start].getMyType()) {
+            switch (Cboard[x_start][y_start].getMyType()) {
                 case ROOK: //assuming the player is black
                   //  System.out.println("rook");
-                    moves.addAll(getRookMoves(x_start, y_start, board));
+                    moves.addAll(getRookMoves(x_start, y_start, Cboard));
                     break;
                 case BISHOP:
                  //   System.out.println("Bishop");
-                    moves.addAll(getBishopMoves(x_start, y_start, board));
+                    moves.addAll(getBishopMoves(x_start, y_start, Cboard));
                     break;
                 case KING:
                   //  System.out.println("King");
-                    moves.addAll(getKingMoves(x_start, y_start, board));
+                    moves.addAll(getKingMoves(x_start, y_start, Cboard));
                     break;
                 case KNIGHT:
                   //  System.out.println("Knight");
-                    moves.addAll(getKnightMoves(x_start, y_start, board));
+                    moves.addAll(getKnightMoves(x_start, y_start, Cboard));
                     break;
                 case PAWN:
                   //  System.out.println("PAWN");
-                    moves.addAll(getPawnMoves(x_start, y_start, board));
+                    moves.addAll(getPawnMoves(x_start, y_start, Cboard));
                     break;
                 case QUEEN:
                    // System.out.println("QUEEN");
-                    moves.addAll(getQueenMoves(x_start, y_start, board));
+                    moves.addAll(getQueenMoves(x_start, y_start, Cboard));
                     break;
                 case EMPTY:
                    // System.out.println("EMPTY");
