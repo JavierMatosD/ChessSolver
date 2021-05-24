@@ -25,16 +25,21 @@ public class MoveTree {
             oppCurrentMoves.clear();
             //set children of all myCurrentMoves. Put them in oppCurrentMoves
             if (i < maxDepth - 1) {
-//                for (myMoveNode n : myCurrentMoves) { //iterate over all moves, set children for those leading to check
-//                    if (ChessPuzzle.staticCheckCheck(!this.puzzle.whiteTurn, n.getBoardState())) {
-//                        n.check = true;
-//                        n.setChildren();
-//                        oppCurrentMoves.addAll(n.children);
-//                    }
-//                }
+                for (myMoveNode n : myCurrentMoves) { //iterate over all moves, set children for those leading to check
+                    if (ChessPuzzle.staticCheckCheck(!this.puzzle.whiteTurn, n.getBoardState())) {
+                        n.check = true;
+                        n.setChildren();
+                        if(this.root.checkMate)
+                            return root.getSolutions();
+                        oppCurrentMoves.addAll(n.children);
+
+                    }
+                }
                 for (myMoveNode n : myCurrentMoves) { //set children for the rest
                     if (!n.check) {
                         n.setChildren();
+                        if(this.root.checkMate)
+                            return root.getSolutions();
                         oppCurrentMoves.addAll(n.children);
                     }
                 }

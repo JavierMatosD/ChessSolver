@@ -4,11 +4,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 public class MoveTreeParallel {
     AtomicBoolean isSolved;
     oppMoveNode root;
     ChessPuzzle puzzle;
+    AtomicReferenceArray<AtomicReferenceArray<ChessPiece>> board;
     ExecutorService pool;
 
     public MoveTreeParallel(ChessPuzzle puzzle, ExecutorService pool) {
@@ -16,6 +18,9 @@ public class MoveTreeParallel {
         this.root = new oppMoveNode(null, null, puzzle);
         this.isSolved = new AtomicBoolean(false);
         this.pool = pool;
+//        this.board = new AtomicReferenceArray<AtomicReferenceArray<ChessPiece>>(8);
+//        for(int i = 0; i < 8; i++)
+//            this.board.set(i, new AtomicReferenceArray<>(this.puzzle.board[i]));
     }
 
     public LinkedList<LinkedList<Move>> solveTree(int maxDepth) {
