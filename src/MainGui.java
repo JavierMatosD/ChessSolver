@@ -5,7 +5,7 @@ import java.util.concurrent.Executors;
 
 class MainGui {
     public static void main(String[] args) {
-         int nThreads = Runtime.getRuntime().availableProcessors();
+        int nThreads = Runtime.getRuntime().availableProcessors();
         ExecutorService pool = Executors.newFixedThreadPool(nThreads);
         File directoryPath = new File("puzzles");
         if (!directoryPath.exists())
@@ -14,19 +14,20 @@ class MainGui {
         contents = directoryPath.list();
         // mate in one puzzle
         String puzzlePath;
-        if(args.length ==0)
-        puzzlePath = contents[0];
-        else puzzlePath = args[0];
+        if (args.length == 0)
+            puzzlePath = contents[0];
+        else
+            puzzlePath = args[0];
 
         long start = System.nanoTime();
-        try{          
+        try {
             ChessPuzzle puzzle = ChessBoardParser.parse(directoryPath + "/" + puzzlePath);
             String turn = puzzle.whiteTurn == true ? "WHITE" : "BLACK";
             Gui gui = new Gui(puzzle.board, turn);
-            LinkedList<LinkedList<Move>> moves =  puzzle.solvePuzzle();
+            LinkedList<LinkedList<Move>> moves = puzzle.solvePuzzle();
             LinkedList<Move> move = moves.get(0);
             gui.moves = move;
-        } catch(Exception e){
+        } catch (Exception e) {
 
         }
 
