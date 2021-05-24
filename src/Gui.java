@@ -41,6 +41,9 @@ class Gui extends JFrame {
     LinkedList<Move> moves = new LinkedList<>();
     int currentMove = 0;
 
+    // next turn button
+    JButton next = new JButton("NEXT MOVE");
+
     private LinkedList<Shape> separateShapeIntoRegions(Shape shape) {
         LinkedList<Shape> regions = new LinkedList<Shape>();
 
@@ -225,14 +228,10 @@ class Gui extends JFrame {
                         Color bg = determineBackground(i, j);
 
                         // determine side of piece
-                        char side = 'B';
-                        if (piece.isWhite())
-                            side = 'W';
                         int sideNumber = 0;
 
-                        if (side == 'B') {
+                        if (!piece.isWhite())
                             sideNumber = 1;
-                        }
 
                         // draw
                         addColoredUnicodeCharToContainer(pieceNumber, index, sideNumber, bg, gradientFill);
@@ -242,21 +241,7 @@ class Gui extends JFrame {
                 // some padding and button
                 boardPanel.add(new JLabel(" ", SwingConstants.CENTER));
                 boardPanel.add(new JLabel(" ", SwingConstants.CENTER));
-                // next puzzle button
-                // button
-                // JButton nextPuzzle = new JButton("NEXT PUZZLE");
-                // nextPuzzle.addActionListener(new ActionListener() {
-                // @Override
-                // public void actionPerformed(ActionEvent e) {
-                // // execute the next move on the board
-                // executeNextPuzzle();
-                // }
-                // });
-                // nextPuzzle.setMargin(new Insets(0, -4, 0, -4));
-                // boardPanel.add(nextPuzzle);
 
-                // next turn button
-                JButton next = new JButton("NEXT TURN");
                 next.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -264,7 +249,7 @@ class Gui extends JFrame {
                         executeNextMove();
                     }
                 });
-                next.setMargin(new Insets(0, -4, 0, -4));
+                next.setMargin(new Insets(0, 0, 0, 0));
                 boardPanel.add(next);
                 boardPanel.add(new JLabel(" ", SwingConstants.CENTER));
 
@@ -289,10 +274,37 @@ class Gui extends JFrame {
     }
 
     public void executeNextMove() {
-        if (currentMove > moves.size() - 1) {
-            int[] from = new int[] { 0,0 };
-            int[] to = new int[] { 0,0 };
-            move(from, to, true);
+        if (currentMove == moves.size()) {
+            if (currentMove > 0) {
+                // checkmate since moves are done
+                this.movesModel.addElement("CHECKMATE");
+                next.setText("OVER");
+                next.setEnabled(false);
+                next.paintImmediately(next.getVisibleRect());
+                System.out.println("No more moves available");
+                currentMove += 1;
+                return;
+            } else {
+                // we are still calculating moves
+                next.setText("WAITING...");
+                next.setEnabled(false);
+                next.paintImmediately(next.getVisibleRect());
+
+                while (moves.size() == 0) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                next.setText("NEXT MOVE");
+                next.setEnabled(true);
+                next.paintImmediately(next.getVisibleRect());
+            }
+        }
+
+        if (currentMove > moves.size()) {
             System.out.println("No more moves available");
             return;
         }
@@ -300,21 +312,13 @@ class Gui extends JFrame {
         Move move = this.moves.get(currentMove);
         int[] from = new int[] { move.x_start, move.y_start };
         int[] to = new int[] { move.x_end, move.y_end };
-        move(from, to, false);
+        move(from, to);
 
         currentMove += 1;
     }
 
-    public void executeNextPuzzle() {
-
-    }
-
     // move a piece
-    public void move(int[] from, int[] to, boolean checkmate) {
-        if (checkmate) {
-            this.movesModel.addElement("CHECKMATE");
-            return;
-        }
+    public void move(int[] from, int[] to) {
         // converting them to jpanel coordinates
         // to find its position in the JPanel "Array"
         int f = 9 * from[0] + from[1];
@@ -322,7 +326,6 @@ class Gui extends JFrame {
 
         // get the pieces from state
         ChessPiece fromPiece = state[f];
-        ChessPiece toPiece = state[t];
 
         // determine name of piece we are moving
         // if there is a piece where we are moving
@@ -337,15 +340,10 @@ class Gui extends JFrame {
         // determine side of piece we are moving
         // if there is a piece where we are moving
         // it wouldn't matter - we are going to capture it
-        char side = 'B';
-        if (fromPiece.isWhite())
-            side = 'W';
+        int sideNumber = 0;
 
-        int sideNumber = 0; // some of this can be cut down...
-
-        if (side == 'B') {
+        if (!fromPiece.isWhite())
             sideNumber = 1;
-        }
 
         // replace from with empty box
         boardPanel.remove(f);
