@@ -24,6 +24,8 @@ public class ChessPuzzle {
     public static boolean parallel;
     public static ExecutorService pool;
     public boolean superParallel;
+//    public static long checkCheckTime = 0;
+//    public static long otherGetLegalTime = 0;
 
     public ChessPuzzle(boolean whiteTurn, ChessPiece[][] board) {
         this.board = board;
@@ -189,16 +191,23 @@ public class ChessPuzzle {
     public LinkedList<Move> getLegalMoves() {
         if(parallel)
             return getLegalMovesParallel();
+//        long start = System.nanoTime();
+
         LinkedList<Move> moves = new LinkedList<Move>();
 
         for (int i = 0; i < 8; i++)
             for (int j = 0; j < 8; j++) {
                 moves.addAll(getLocationLegalMoves(i, j, this.whiteTurn));
             }
-
+//        long end = System.nanoTime();
+//        long mstime = ((end - start) / 1_000_000);
+//        otherGetLegalTime+= mstime;
+//        start = System.nanoTime();
         //if a move leads to check for the player whose turn it is, remove it
         moves.removeIf(o -> checkCheck(o, this.whiteTurn, this.board));
-
+//        end = System.nanoTime();
+//        mstime = ((end - start) / 1_000_000);
+//        checkCheckTime+= mstime;
         return moves;
 
     }

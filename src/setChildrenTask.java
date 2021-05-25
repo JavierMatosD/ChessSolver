@@ -18,8 +18,8 @@ public class setChildrenTask<T> implements Runnable, Callable {
     @Override
     public void run() {
         n.setChildren();
-//        System.out.println(n.getChildren());
-        allChildren.addAll(n.getChildren()); //interesting. Accessing children directly threw NullPointerException. You'd think within a task it would run sequentially?
+        //check root.checkmate?
+//        allChildren.addAll(n.getChildren()); //interesting. Accessing children directly threw NullPointerException. You'd think within a task it would run sequentially?
         latch.countDown();
 
     }

@@ -51,7 +51,6 @@ public class MoveTree {
             }
             myCurrentMoves.clear();
             if (root.checkMate) {
-
                 return root.getSolutions();
             }
 

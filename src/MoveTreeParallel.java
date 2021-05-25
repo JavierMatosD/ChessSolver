@@ -8,8 +8,8 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 
 public class MoveTreeParallel {
     AtomicBoolean isSolved;
-    oppMoveNode root;
-    ChessPuzzle puzzle;
+    final oppMoveNode root;
+    final ChessPuzzle puzzle;
     AtomicReferenceArray<AtomicReferenceArray<ChessPiece>> board;
     ExecutorService pool;
 
@@ -37,10 +37,13 @@ public class MoveTreeParallel {
                 pool.execute(new setChildrenTask<>(n, myCurrentMoves, latch));
             }
             try {
-                latch.await();
+                latch.await(); //interrupt when mate found
             } catch (InterruptedException e){
                 System.out.println("Latch interrupted. That's not good.");
                 System.exit(-1);
+            }
+            for (Node n : oppCurrentMoves) {
+                myCurrentMoves.addAll(n.getChildren());
             }
             oppCurrentMoves.clear();
 
@@ -57,6 +60,9 @@ public class MoveTreeParallel {
                 } catch (InterruptedException e){
                     System.out.println("Latch interrupted. That's not good.");
                     System.exit(-1);
+                }
+                for (Node n : myCurrentMoves) {
+                    oppCurrentMoves.addAll(n.getChildren());
                 }
             }
             else { //when on the last level
@@ -79,11 +85,11 @@ public class MoveTreeParallel {
 
 
     public class oppMoveNode extends Node {
-        myMoveNode parent; //null for root node
+        final myMoveNode parent; //null for root node
         LinkedList<myMoveNode> children;
-        Move value; //null for root node
+        final Move value; //null for root node
         AtomicBoolean checkMate; //true if true for any children
-        ChessPuzzle puzzle;
+        final ChessPuzzle puzzle;
         MoveTree tree;
 
 
@@ -149,11 +155,11 @@ public class MoveTreeParallel {
     }
 
     class myMoveNode extends Node {
-        oppMoveNode parent;
+        final oppMoveNode parent;
         LinkedList<oppMoveNode> children;
-        Move value;
+        final Move value;
         AtomicBoolean checkMate; //set to true if true for all children
-        ChessPuzzle puzzle;
+        final ChessPuzzle puzzle;
         AtomicBoolean check;
 
         public myMoveNode(Move value, oppMoveNode parent, ChessPuzzle puzzle) {
