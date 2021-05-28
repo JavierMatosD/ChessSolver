@@ -2,7 +2,8 @@
 
 ## Description
 
-This program solves chess puzzles and displays the solution in a graphical representation.
+This program solves chess puzzles and displays the solution in a graphical representation. The user can try to come up with the solution themselves 
+and if they can't, see the answer move by move.
 
 ## Preliminary description
 
@@ -61,8 +62,8 @@ we looked to parallelize the setChildren method, which we did in MoveTreeParalle
 children, there should be very little concurrent accesses with this. The only thing that multiple threads might need to access is the 
 boolean checkmate of parents, which we simply made atomic. So each thread sets the children for its node, and a CountDownLatch waits for all
 nodes to have their children set before the next set of children are set. This led to worse performance than both the sequential and the other
-parallelization implementation, which is surprising. In theory, with fewer tasks created, this
-should be better than the other implementation. We tried replacing the shared data structure with one that is updated sequentially by 
+parallelization implementation, which is surprising. In theory, with fewer tasks created and theoretically less downtime (since threads aren't waiting 
+on each other to finish each individual node), this should be better than the other implementation. We tried replacing the shared data structure with one that is updated sequentially by 
 the main thread, but that made no difference. We also made fields final to make sure checks for cache invalidations aren't slowing us down,
 but still no difference. Ultimately we gave up on this implementation and focused on the other two, since we couldn't figure out why it 
 was underperforming.

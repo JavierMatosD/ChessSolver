@@ -44,10 +44,10 @@ public class Main {
 
 
             ChessPuzzle.parallel = false;
-//            System.out.println(s + ": " + puzzle.solvePuzzleSuperParallel(pool));
-//            end = System.nanoTime();
-//            mstime = ((end - start) / 1_000_000);
-//            System.out.println("Took " + mstime + " ms to solve this puzzle with super parallelism.");
+            System.out.println(s + ": " + puzzle.solvePuzzleSuperParallel(pool));
+            end = System.nanoTime();
+            mstime = ((end - start) / 1_000_000);
+            System.out.println("Took " + mstime + " ms to solve this puzzle with super parallelism.");
         }
 
         pool.shutdown();
