@@ -26,7 +26,9 @@ public class getLocationLegalMovesTask implements Runnable
     @Override
     public void run() 
     {
-        sharedList.getAndSet(id, puzzle.getLocationLegalMoves(row, col, puzzle.whiteTurn, puzzle.board));
+        LinkedList<Move> moves = puzzle.getLocationLegalMoves(row, col, puzzle.whiteTurn, puzzle.board, true);
+        moves.removeIf(m -> puzzle.checkCheck(m, puzzle.whiteTurn, puzzle.board));
+        sharedList.getAndSet(id, moves);
         latch.countDown();
     }
     
