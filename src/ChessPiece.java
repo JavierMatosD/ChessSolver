@@ -1,5 +1,5 @@
 import java.util.Objects;
-
+//ChessPiece object. Has a type and a boolean for what color it is.
 public class ChessPiece{
 
     type myType;
@@ -56,6 +56,6 @@ public class ChessPiece{
 }
 
 enum type {
-    ROOK, KNIGHT, BISHOP, QUEEN, KING, PAWN, EMPTY //replace empty with null?
+    ROOK, KNIGHT, BISHOP, QUEEN, KING, PAWN, EMPTY
 }
 

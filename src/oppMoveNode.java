@@ -1,5 +1,8 @@
 import java.util.LinkedList;
 
+//OppMoveNode and MyMoveNode implementation, used before the MoveTree class was created to hold both.
+
+@Deprecated
 public class oppMoveNode {
     myMoveNode parent; //null for root node
     LinkedList<myMoveNode> children;

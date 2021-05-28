@@ -3,11 +3,13 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
+
+//a tree that stores the moves of the game. Each node's children are the moves the opponent can make after this move is made.
 public class MoveTree {
     boolean isSolved;
-    oppMoveNode root;
+    oppMoveNode root; //root is an oppMoveNode with null parent and value.
     ChessPuzzle puzzle;
-    static final boolean earlyTermination = true; //change this value to false to do a direct comparison between super parallelism and the other two implementations
+    static boolean earlyTermination = true; //change this value to false to do a direct comparison between super parallelism and the other two implementations
 
     public MoveTree(ChessPuzzle puzzle) {
         this.puzzle = puzzle;
@@ -15,7 +17,7 @@ public class MoveTree {
         this.isSolved = false;
     }
 
-
+    //solves the tree, looking for the shortest solution with no more moves than maxDepth.
     public LinkedList<LinkedList<Move>> solveTree(int maxDepth) {
 
         LinkedList<myMoveNode> myCurrentMoves = new LinkedList<>();
@@ -33,7 +35,7 @@ public class MoveTree {
                     if (ChessPuzzle.staticCheckCheck(!this.puzzle.whiteTurn, n.getBoardState())) {
                         n.check = true;
                         n.setChildren();
-                        if (this.root.checkMate)
+                        if (earlyTermination&&this.root.checkMate)
                             return root.getSolutions();
                         oppCurrentMoves.addAll(n.children);
 
@@ -42,8 +44,6 @@ public class MoveTree {
                 for (myMoveNode n : myCurrentMoves) { //set children for the rest
                     if (!n.check) {
                         n.setChildren();
-                        if (this.root.checkMate)
-                            return root.getSolutions();
                         oppCurrentMoves.addAll(n.children);
                     }
                 }

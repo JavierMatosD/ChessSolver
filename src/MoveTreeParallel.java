@@ -42,7 +42,7 @@ public class MoveTreeParallel {
                 System.out.println("Latch interrupted. That's not good.");
                 System.exit(-1);
             }
-            for (Node n : oppCurrentMoves) {
+            for (Node n : oppCurrentMoves) { //sequentially add the children of all nodes, now set, to the list.
                 myCurrentMoves.addAll(n.getChildren());
             }
             oppCurrentMoves.clear();
@@ -61,7 +61,7 @@ public class MoveTreeParallel {
                     System.out.println("Latch interrupted. That's not good.");
                     System.exit(-1);
                 }
-                for (Node n : myCurrentMoves) {
+                for (Node n : myCurrentMoves) {//sequentially add the children of all nodes, now set, to the list.
                     oppCurrentMoves.addAll(n.getChildren());
                 }
             }

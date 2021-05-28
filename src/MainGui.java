@@ -4,6 +4,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 class MainGui {
+    static boolean parallel = false; //whether the solver will use parallelization or not
+
     public static void main(String[] args) {
         int nThreads = Runtime.getRuntime().availableProcessors();
         ExecutorService pool = Executors.newFixedThreadPool(nThreads);
@@ -24,6 +26,8 @@ class MainGui {
             ChessPuzzle puzzle = ChessBoardParser.parse(directoryPath + "/" + puzzlePath);
             String turn = puzzle.whiteTurn == true ? "WHITE" : "BLACK";
             Gui gui = new Gui(puzzle.board, turn);
+            if(parallel)
+                puzzle.addPool(pool);
             LinkedList<LinkedList<Move>> moves = puzzle.solvePuzzle();
             LinkedList<Move> move = moves.get(0);
             gui.moves = move;

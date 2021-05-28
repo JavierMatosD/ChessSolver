@@ -1,10 +1,9 @@
 
 /**
- * Move represents a single move on the chess board
+ * Move represents a single move on the chess board.
  */
 
-//TODO: perhaps move could include an instance variable pointing to a parent ChessPuzzle?
-public class Move 
+public class Move
 {
     ChessPiece chessPiece;
     int x_start;
@@ -22,7 +21,7 @@ public class Move
     }
 
 
-
+//takes in a board and returns a board with this move executed. NOT an in place modification
     public ChessPiece[][] executeMove(ChessPiece[][] start_state){
         if(!start_state[x_start][y_start].equals(this.chessPiece)) {
             System.out.println("Tried to execute move " + this + " but " + start_state[x_start][y_start] + " was the piece found in the starting spot");
@@ -38,14 +37,6 @@ public class Move
         return toReturn;
     }
 
-    public boolean check(ChessPiece[][] board)
-    {
-        if(board[this.x_end][this.y_end].getMyType() == type.KING)
-        {
-            return true;
-        }
-        return false;
-    }
 
     @Override
     public String toString() {

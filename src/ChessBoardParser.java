@@ -6,7 +6,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.List;
 
-
+//This class parses txt files into ChessPuzzle objects
 //from: https://techblogstation.com/java/read-text-file-in-java/
 
 public class ChessBoardParser {

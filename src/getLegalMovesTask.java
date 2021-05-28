@@ -1,7 +1,8 @@
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReferenceArray;
-
+//old task for getting legal moves without checking for check
+@Deprecated
 public class getLegalMovesTask implements Runnable, Callable 
 {
     

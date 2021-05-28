@@ -24,12 +24,8 @@ public class ChessPuzzle {
     int blackKingYPos;
     int whiteKingXPos;
     int whiteKingYPos;
-    public static boolean parallel;
-    public static ExecutorService pool;
-    public boolean superParallel;
-//    public static long checkCheckTime = 0;
-//    public static long otherGetLegalTime = 0;
-
+    public static boolean parallel; //controls whether getLegalMoves is sequential or parallel.
+    public static ExecutorService pool; //pool is static since new ChessPuzzles are created by solver
     public ChessPuzzle(boolean whiteTurn, ChessPiece[][] board) {
         this.board = board;
         this.whiteTurn = whiteTurn;
@@ -66,7 +62,7 @@ public class ChessPuzzle {
 
     }
 
-
+    //same constructor as above, just adds in a pool as well
     public ChessPuzzle(boolean whiteTurn, ChessPiece[][] board, ExecutorService pool) {
         this.board = board;
         this.whiteTurn = whiteTurn;
@@ -104,19 +100,19 @@ public class ChessPuzzle {
 
     }
 
+
+    //method that adds a pool and sets parallel to true
     public void addPool(ExecutorService pool) {
         parallel = true;
         this.pool = pool;
     }
 
-    //returns the first move found resulting in checkmate
+    //returns the first move found resulting in checkmate. One move mates only
+    @Deprecated
     public Move solvePuzzleOneMove() {
         LinkedList<Move> legalMoves = this.getLegalMoves();
-        Iterator itr = legalMoves.iterator();
-        while (itr.hasNext()) {
-            if (!checkCheck((Move) itr.next(), !this.whiteTurn, this.board)) //if a move does not lead to check on the opposing king, remove it
-                itr.remove();
-        }
+        //if a move does not lead to check on the opposing king, remove it
+        legalMoves.removeIf(o -> !checkCheck((Move) o, !this.whiteTurn, this.board));
         ChessPuzzle p;
         for (Move m : legalMoves) {
             p = new ChessPuzzle(!this.whiteTurn, m.executeMove(this.board)); //create a new puzzle that represents the state after the move is executed
@@ -125,7 +121,8 @@ public class ChessPuzzle {
         }
         return null;
     }
-
+    @Deprecated
+    //old attempt to solve the puzzle using the MoveTree.
     public LinkedList<LinkedList<Move>> nodeSolvePuzzle() {
         oppMoveNode root = new oppMoveNode(null, null, this);
         root.setChildren();
@@ -151,12 +148,13 @@ public class ChessPuzzle {
         return root.getSolutions();
     }
 
+    //solves the puzzle, max depth 3 hardcoded. Could be sequential or with getLegalParallelized
     public LinkedList<LinkedList<Move>> solvePuzzle() {
         MoveTree mt = new MoveTree(this);
         return mt.solveTree(3);
     }
 
-
+    //solves the puzzle, max depth 3 hardcoded.
     public LinkedList<LinkedList<Move>> solvePuzzleSuperParallel(ExecutorService pool) {
         MoveTreeParallel mt = new MoveTreeParallel(this, pool);
         return mt.solveTree(3);
@@ -204,15 +202,10 @@ public class ChessPuzzle {
             for (int j = 0; j < 8; j++) {
                 moves.addAll(getLocationLegalMoves(i, j, this.whiteTurn, this.board, true));
             }
-//        long end = System.nanoTime();
-//        long mstime = ((end - start) / 1_000_000);
-//        otherGetLegalTime+= mstime;
-//        start = System.nanoTime();
+
         //if a move leads to check for the player whose turn it is, remove it
         moves.removeIf(o -> checkCheck(o, this.whiteTurn, this.board));
-//        end = System.nanoTime();
-//        mstime = ((end - start) / 1_000_000);
-//        checkCheckTime+= mstime;
+
         return moves;
 
     }
@@ -310,7 +303,7 @@ public class ChessPuzzle {
                 default:
                     break;
             }
-        } catch (Exception e) {
+        } catch (Exception e) { //if there's an exception, make a new GUI with the board state so we can make a test case out of the exception and work on fixing it
             Gui board = this.makeGui();
             System.out.println(e.getMessage());
             return null;
@@ -820,8 +813,9 @@ public class ChessPuzzle {
     /**
      * Checks if the move leads to check. This method is called by ChessPuzzle.getLegalMoves().
      * Additionally this method depends on methods ChessPuzzle.getLegalMovesIgnoreCheck() and
-     * Move.check(ChessPuzzle board)
-     * //TODO: I think the functionality here should be split up
+     * Move.check(ChessPuzzle board). There are three different checkCheck methods with slightly different functionality.
+     * This is bad coding practice. We know.
+     *
      *
      * @param move       move to be executed
      * @param checkWhite if true, then we're looking to see if white king in check. If false, black king
@@ -861,7 +855,8 @@ public class ChessPuzzle {
 
     }
 
-    //possibly could be made static? Probably not but worth considering.
+    //Checks if a square is threatened. Used in checkCheck, but could be useful for advanced chess AI that, for example,
+    //doesn't want to hang their queen.
     public boolean checkThreatened(int xpos, int ypos, LinkedList<Move> moves) {
         for (Move m : moves)
             if (m.x_end == xpos && m.y_end == ypos)
@@ -869,6 +864,7 @@ public class ChessPuzzle {
         return false;
     }
 
+    //creates Gui from boardstate
     public Gui makeGui() {
         if (whiteTurn)
             return new Gui(this.board, "WHITE");
@@ -876,12 +872,6 @@ public class ChessPuzzle {
 
     }
 
-    public static ChessPiece[][] executeMoves(LinkedList<Move> moves, ChessPiece[][] board) {
-        for (Move m : moves) {
-            board = m.executeMove(board);
-        }
-        return board;
-    }
 
 
 }

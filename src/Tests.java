@@ -2,7 +2,7 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
+//Class that runs tests and validates the correct number of moves is returned
 public class Tests {
     static Hashtable<String, Integer> expectedResults = new Hashtable<String, Integer>();
 

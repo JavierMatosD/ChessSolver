@@ -1,4 +1,4 @@
-//CastleMove stores as its own move the King's movement, and a Move rookMove for the rook's movement.
+//Special move for when a pawn promotes.
 
 public class PromotionMove extends Move {
     ChessPiece promoteTo;

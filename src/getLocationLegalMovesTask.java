@@ -6,7 +6,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
-
+//this task takes in a location and a puzzle and creates a list of all legal moves from that location (including making sure those moves
+//don't put your king in check. It puts that list into an AtomicReferenceArray that's shared by all threads and counts down a latch.
 public class getLocationLegalMovesTask implements Runnable
 {
     ChessPuzzle puzzle;
